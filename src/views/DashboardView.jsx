@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Droplets, AlertTriangle, Undo2, CheckCircle2, Utensils, Sun, Moon, Clock, ShoppingCart, Leaf, Trash2, TrendingUp } from 'lucide-react';
-import useAuth from '../hooks/useAuth';
+
 import MemberAvatar from '../components/MemberAvatar';
 import MicroCheck from '../components/MicroCheck';
 import DutyAvatar from '../components/DutyAvatar';
@@ -171,7 +171,7 @@ const DashboardView = ({
         .sort((a, b) => new Date(b.completedAt) - new Date(a.completedAt)); // Newest first
 
     // Cycle Progress
-    const totalCyclePairs = waterDoneCycle.length + waterPending.length + (waterPool.length > 0 ? 1 : 0);
+
     const currentProgress = (waterDoneCycle.length + waterPending.length) > 0
         ? waterDoneCycle.length / (waterDoneCycle.length + waterPending.length + (waterPool.length > 1 ? Math.floor(waterPool.length / 2) : 0))
         : 0;

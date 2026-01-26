@@ -97,20 +97,7 @@ const ExpensesView = ({
         triggerAlert(`Default amount for ${editingCategory} updated`, "success");
     };
 
-    useEffect(() => {
-        if (showVegAddModal) {
-            const { remaining } = getMemberStatus(vegFromId, vegCategory);
-            setVegAmount(remaining > 0 ? remaining : '');
-        }
-    }, [vegFromId, vegCategory, showVegAddModal]);
-
-    const handleEditClick = (memberId, category) => {
-        setVegFromId(memberId);
-        setVegCategory(category);
-        setShowVegAddModal(true);
-    };
-
-    const getMemberStatus = (memberId, category) => {
+    const getMemberStatus = React.useCallback((memberId, category) => {
         if (vegExemptions.includes(`${memberId}-${category}`)) return { status: 'cancelled', paid: 0, remaining: 0 };
         const paid = vegCollections
             .filter(c => c.fromMemberId === memberId && (c.category === category || (!c.category && category === CATEGORY_VEGETABLES)))
@@ -119,7 +106,22 @@ const ExpensesView = ({
         if (paid >= expected) return { status: 'full', paid, remaining: 0, excess: paid - expected };
         if (paid > 0) return { status: 'partial', paid, remaining: expected - paid };
         return { status: 'pending', paid: 0, remaining: expected };
+    }, [vegExemptions, vegCollections, expectedAmounts]);
+
+    useEffect(() => {
+        if (showVegAddModal) {
+            const { remaining } = getMemberStatus(vegFromId, vegCategory);
+            setVegAmount(remaining > 0 ? remaining : '');
+        }
+    }, [vegFromId, vegCategory, showVegAddModal, getMemberStatus]);
+
+    const handleEditClick = (memberId, category) => {
+        setVegFromId(memberId);
+        setVegCategory(category);
+        setShowVegAddModal(true);
     };
+
+
 
     const renderCategoryList = (title, category) => {
         const expectedPerPerson = expectedAmounts[category];
@@ -259,7 +261,7 @@ const ExpensesView = ({
                                 ...vegExpenses.map(e => ({ ...e, type: 'vegExp', collection: 'vegExpenses', date: new Date(e.date) })),
                                 ...vegCollections.map(e => ({ ...e, type: 'vegCol', collection: 'vegCollections', date: new Date(e.date) }))
                             ].sort((a, b) => b.date - a.date).map(t => {
-                                const isMine = t.paidBy === currentUser.id || t.spentBy === currentUser.id || t.fromMemberId === currentUser.id;
+
                                 const canDelete = !isGuest; // HOTFIX: Allow all to delete
 
                                 return (

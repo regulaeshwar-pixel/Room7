@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { X, Calendar, DollarSign, Droplets, TrendingUp } from 'lucide-react';
+import { X, DollarSign, Droplets, TrendingUp } from 'lucide-react';
 import Card from '../components/Card';
 import { formatCurrency } from '../utils/helpers';
 import MemberAvatar from '../components/MemberAvatar';

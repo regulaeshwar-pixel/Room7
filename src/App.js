@@ -1,36 +1,25 @@
 import React, { useState, useEffect, useMemo, useRef, useReducer } from 'react';
 import {
   CheckCircle2,
-  Circle,
+
   Droplets,
   ShoppingCart,
   Utensils,
-  Moon,
-  Sun,
+
+
   Calendar,
   Users,
   DollarSign,
-  Plus,
-  Trash2,
-  Clock,
+
   Menu,
   X,
   Edit2,
   ToggleLeft,
   ToggleRight,
-  Leaf,
-  Minus,
-  Lock,
-  Undo2,
-  LogOut,
   Bell,
   AlertTriangle,
   Info,
   GripVertical,
-  Ban,
-  Shield,
-  Eye,
-  EyeOff,
   PartyPopper
 } from 'lucide-react';
 
@@ -62,7 +51,7 @@ const INITIAL_MEMBERS = [
   { id: 'm7', name: 'Sai', role: 'Member', avatar: 'SA', pin: '0000', streak: { current: 0, best: 0 } },
 ];
 
-const GUEST_USER = { id: 'guest', name: 'Guest', role: 'Visitor', avatar: 'GS' };
+
 
 const DEFAULT_SCHEDULE = {
   Monday: { morningDish: ['m2'], nightDish: ['m3'], cleaning: ['m4'], market: ['m2', 'm5'] },
@@ -177,16 +166,7 @@ const Card = ({ children, className = "", onClick }) => (
   </div>
 );
 
-const Badge = ({ children, variant = 'neutral' }) => {
-  const styles = {
-    neutral: 'bg-slate-100 text-slate-600',
-    success: 'bg-emerald-100 text-emerald-700',
-    warning: 'bg-amber-100 text-amber-700',
-    danger: 'bg-rose-100 text-rose-700',
-    blue: 'bg-blue-100 text-blue-700',
-  };
-  return <span className={`px-2 py-1 rounded-md text-xs font-medium ${styles[variant]}`}>{children}</span>;
-};
+
 
 const MemberAvatar = ({ name, code, size = 'sm', className = '' }) => {
   const sizeClass = size === 'sm' ? 'w-8 h-8 text-xs' : 'w-10 h-10 text-sm';
@@ -203,11 +183,7 @@ const NavButton = ({ active, onClick, icon, label }) => (
   </button>
 );
 
-const ActionButton = ({ onClick, done, label }) => (
-  <button onClick={onClick} className={`w-full py-2 rounded-lg font-bold text-sm transition-all flex items-center justify-center gap-2 ${done ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-800 text-white hover:bg-slate-900'}`}>
-    {done ? <CheckCircle2 size={16} /> : null}{done ? 'Completed' : label}
-  </button>
-);
+
 
 // --- SWIPEABLE NOTIFICATION COMPONENT ---
 
@@ -444,9 +420,7 @@ function useSmartNotifications(context) {
     dispatch({ type: 'SET_PERSISTENT', payload: finalAlerts });
 
   }, [
-    context.isWaterLow, context.waterPairs, context.schedule, context.tasks,
-    context.currentUser, context.vegBalance, context.simulatedDate,
-    state.ready, state.dismissed, state.devMode, context.dailySchedule
+    context, state.ready, state.dismissed, state.devMode
   ]);
 
   return { state, dispatch };
@@ -519,7 +493,7 @@ export default function App() {
   const [includeCook, setIncludeCook] = useState(false);
   const [waterPairs, setWaterPairs] = useState([]);
   const [waterSelection, setWaterSelection] = useState([]);
-  const [lastCycleSummary, setLastCycleSummary] = useState(null); // Tracking cycle completion
+
   const [isWaterLow, setIsWaterLow] = useState(false);
   const [showSummary, setShowSummary] = useState(false);
   const [showChangeLog, setShowChangeLog] = useState(false);
@@ -632,6 +606,7 @@ export default function App() {
       unsubVegExp();
       unsubWaterPairs();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const [showPinModal, setShowPinModal] = useState(false);
@@ -700,14 +675,14 @@ export default function App() {
   const totalVegGiven = vegCollections.reduce((sum, c) => sum + c.amount, 0);
   const totalVegExpenses = vegExpenses.reduce((sum, e) => sum + e.amount, 0);
   const vegBalance = totalVegGiven - totalVegExpenses;
-  const totalGeneralExpenses = expenses.reduce((sum, e) => sum + e.amount, 0);
-  const totalMonthlyExpenses = totalGeneralExpenses + totalVegExpenses;
 
-  const getTaskStatus = (taskId) => {
+
+
+  const getTaskStatus = React.useCallback((taskId) => {
     if (tasks === null) return 'loading'; // New value
     const key = `${simulatedDate.toDateString()}-${taskId}`;
     return tasks[key]?.status || 'pending';
-  };
+  }, [tasks, simulatedDate]);
 
   const hasCompletedAllTasks = useMemo(() => {
     const todayTasks = [];
@@ -720,7 +695,7 @@ export default function App() {
 
     if (todayTasks.length === 0) return false;
     return todayTasks.every(t => getTaskStatus(t) === 'done');
-  }, [dailySchedule, tasks, simulatedDate]);
+  }, [dailySchedule, getTaskStatus]);
 
 
   const notificationContext = useMemo(() => ({
@@ -736,7 +711,7 @@ export default function App() {
     currentHour,
     getTaskStatus,
     hasCompletedAllTasks
-  }), [isWaterLow, waterPairs, schedule, dailySchedule, tasks, currentUser, vegBalance, simulatedDate, vegHandlerId, currentHour, hasCompletedAllTasks]);
+  }), [isWaterLow, waterPairs, schedule, dailySchedule, tasks, currentUser, vegBalance, simulatedDate, vegHandlerId, currentHour, hasCompletedAllTasks, getTaskStatus]);
 
   const { state: notificationState, dispatch: notifyDispatch } = useSmartNotifications(notificationContext);
 
@@ -855,7 +830,7 @@ export default function App() {
     const pairedMembers = new Set();
     waterPairs.filter(p => !p.archived && p.status === 'pending').forEach(p => p.members.forEach(m => pairedMembers.add(m)));
     return pool.filter(id => !pairedMembers.has(id) && !exemptMembers.includes(id)).sort();
-  }, [schedule, includeCook, waterPairs, exemptMembers]);
+  }, [schedule, includeCook, waterPairs, exemptMembers, members]);
 
   useEffect(() => {
     if (waterPool.length === 2 && waterSelection.length === 0) {
@@ -1200,120 +1175,6 @@ export default function App() {
 
 
 
-  const SettingsView = () => {
-    const [isChangePinOpen, setIsChangePinOpen] = useState(false);
-    const [pinFormData, setPinFormData] = useState({ current: '', new: '', confirm: '' });
-
-    const handleChangePin = (e) => {
-      e.preventDefault();
-      if (pinFormData.current !== currentUser.pin) {
-        haptic.error();
-        triggerAlert("Current PIN is incorrect", "danger");
-        return;
-      }
-      if (pinFormData.new.length !== 4) {
-        haptic.error();
-        triggerAlert("New PIN must be 4 digits", "warning");
-        return;
-      }
-      if (pinFormData.new !== pinFormData.confirm) {
-        haptic.error();
-        triggerAlert("New PINs do not match", "danger");
-        return;
-      }
-      const newPin = pinFormData.new;
-      setMembers(prev => prev.map(m => m.id === currentUser.id ? { ...m, pin: newPin } : m));
-      setCurrentUser(prev => ({ ...prev, pin: newPin }));
-      setIsChangePinOpen(false);
-      setPinFormData({ current: '', new: '', confirm: '' });
-      haptic.success();
-      triggerAlert("PIN updated successfully", "success");
-    };
-
-    return (
-      <div className="p-4 space-y-6 pb-24">
-        <h1 className="text-xl font-bold text-slate-800">Profile & Settings</h1>
-
-        <Card className="p-4 space-y-4">
-          <div className="flex justify-between items-center">
-            <h3 className="font-bold text-slate-700">User Profiles</h3>
-            {!isGuest && (
-              <button onClick={logout} className="text-xs flex items-center gap-1 bg-slate-100 px-3 py-1 rounded-full text-slate-600 hover:bg-rose-100 hover:text-rose-600 transition-colors">
-                <LogOut size={12} /> Logout
-              </button>
-            )}
-          </div>
-
-          <div className="grid grid-cols-1 gap-2">
-            {members.map(m => {
-              const isThisHandler = vegHandlerId === m.id;
-              const showLeaf = (!vegHandlerId) || isThisHandler;
-              return (
-                <div key={m.id} className={`flex items-center justify-between p-2 rounded-lg transition-colors ${currentUser.id === m.id ? 'bg-slate-50 border border-slate-200' : ''}`}>
-                  <button onClick={() => { haptic.light(); initiateUserSwitch(m); }} className="flex items-center gap-3 text-left flex-1">
-                    <MemberAvatar name={m.name} code={m.avatar} />
-                    <div><p className={`text-sm font-medium ${currentUser.id === m.id ? 'text-indigo-700' : 'text-slate-700'}`}>{m.name} {currentUser.id === m.id && '(You)'}</p><p className="text-xs text-slate-400">{m.role}</p></div>
-                  </button>
-                  {showLeaf && !isGuest && (
-                    <button onClick={() => { haptic.light(); initiateHandlerToggle(m.id); }} className={`p-2 rounded-full transition-all ${isThisHandler ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-300 hover:text-emerald-500'}`}>
-                      {isThisHandler ? <Lock size={18} /> : <Leaf size={18} />}
-                    </button>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </Card>
-
-        {!isGuest && (
-          <Card className="p-4 space-y-4 border-l-4 border-l-slate-800">
-            <h3 className="font-bold text-slate-700 flex items-center gap-2"><Shield size={18} /> Security</h3>
-            <button onClick={() => setIsChangePinOpen(true)} className="w-full py-3 bg-slate-100 text-slate-700 rounded-xl font-bold text-sm hover:bg-slate-200 transition-colors">Change My PIN</button>
-          </Card>
-        )}
-
-        <Card className="p-4 space-y-4">
-          <h3 className="font-bold text-slate-700">Dev Tools</h3>
-          <div className="flex gap-2 flex-wrap">
-            <button onClick={() => { const d = new Date(simulatedDate); d.setDate(d.getDate() - 1); setSimulatedDate(d); }} className="px-3 py-1 bg-slate-100 rounded text-sm">Prev Day</button>
-            <button onClick={() => setSimulatedDate(new Date())} className="px-3 py-1 bg-slate-100 rounded text-sm">Today</button>
-            <button onClick={() => { const d = new Date(simulatedDate); d.setDate(d.getDate() + 1); setSimulatedDate(d); }} className="px-3 py-1 bg-slate-100 rounded text-sm">Next Day</button>
-            <button onClick={() => setSundayVariant(prev => prev === 3 ? 1 : prev + 1)} className="px-3 py-1 bg-slate-100 rounded text-sm">Toggle Sunday ({sundayVariant})</button>
-            <button onClick={() => notifyDispatch({ type: 'TOGGLE_DEV_MODE' })} className={`px-3 py-1 rounded text-sm flex items-center gap-1 ${notificationState.devMode ? 'bg-indigo-600 text-white' : 'bg-slate-100'}`}>
-              {notificationState.devMode ? <Eye size={14} /> : <EyeOff size={14} />} Inspection Mode
-            </button>
-            <button onClick={triggerDemoNotifications} className="px-3 py-1 bg-slate-100 rounded text-sm">Test Alerts</button>
-          </div>
-        </Card>
-
-        {isChangePinOpen && (
-          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-            <div className="bg-white w-full max-w-sm rounded-2xl p-6">
-              <h3 className="font-bold text-lg mb-4 text-slate-800">Change PIN</h3>
-              <form onSubmit={handleChangePin} className="space-y-4">
-                <div>
-                  <label className="block text-xs font-bold text-slate-500 mb-1">Current PIN</label>
-                  <input type="password" required value={pinFormData.current} onChange={e => setPinFormData({ ...pinFormData, current: e.target.value })} className="w-full p-3 border rounded-xl text-center tracking-widest text-lg" maxLength={4} placeholder="••••" />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-slate-500 mb-1">New PIN</label>
-                  <input type="password" required value={pinFormData.new} onChange={e => setPinFormData({ ...pinFormData, new: e.target.value })} className="w-full p-3 border rounded-xl text-center tracking-widest text-lg" maxLength={4} placeholder="••••" />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-slate-500 mb-1">Confirm New PIN</label>
-                  <input type="password" required value={pinFormData.confirm} onChange={e => setPinFormData({ ...pinFormData, confirm: e.target.value })} className="w-full p-3 border rounded-xl text-center tracking-widest text-lg" maxLength={4} placeholder="••••" />
-                </div>
-                <div className="flex gap-2 pt-2">
-                  <button type="button" onClick={() => setIsChangePinOpen(false)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">Cancel</button>
-                  <button type="submit" className="flex-1 py-3 bg-slate-900 text-white rounded-xl font-bold">Update</button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
-      </div>
-    );
-  };
   /* New Hook usage */
   const { isOnline, isSyncing, hasPendingWrites } = useSyncStatus();
 
