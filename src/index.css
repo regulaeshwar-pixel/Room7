@@ -1,13 +1,254 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Prevent zoom gestures on mobile */
+html,
 body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  touch-action: manipulation;
+  -webkit-text-size-adjust: 100%;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+/* Disable text selection globally (native app feel) */
+* {
+  user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+}
+
+/* Re-enable selection for inputs and textareas (IMPORTANT) */
+input,
+textarea {
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@keyframes shake {
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  25% {
+    transform: translateX(-6px);
+  }
+
+  75% {
+    transform: translateX(6px);
+  }
+}
+
+.animate-shake {
+  animation: shake 0.3s ease-in-out;
+}
+
+@keyframes loginPop {
+  0% {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-login {
+  animation: loginPop 0.25s ease-out;
+}
+
+@keyframes softPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.4);
+  }
+
+  70% {
+    box-shadow: 0 0 0 8px rgba(79, 70, 229, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(79, 70, 229, 0);
+  }
+}
+
+.animate-pulse-soft {
+  animation: softPulse 2.5s infinite;
+}
+
+/* Micro Check Animation */
+@keyframes checkPop {
+  0% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1);
+  }
+}
+
+.micro-check {
+  font-size: 1.5rem;
+  /* Increased slightly for visibility */
+  color: #22c55e;
+  /* green-500 */
+  animation: checkPop 0.4s ease-out forwards;
+  /* Slightly longer duration */
+  font-weight: 900;
+}
+
+.micro-check.undo {
+  color: #f97316;
+  /* orange-500 */
+}
+
+/* Avatar Glow Animation for Next Assigned Member */
+@keyframes nextGlow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.35);
+  }
+
+  70% {
+    box-shadow: 0 0 0 12px rgba(59, 130, 246, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+  }
+}
+
+.next-glow {
+  border-radius: 9999px;
+  animation: nextGlow 2.4s infinite;
+}
+
+/* Long Press & Action Sheet Animations */
+.pressable {
+  transition: transform 120ms ease, background-color 120ms ease;
+}
+
+.pressable:active {
+  transform: scale(0.97);
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-up {
+  animation: slideUp 0.25s ease-out;
+}
+
+@keyframes popIn {
+  0% {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-pop-in {
+  animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.animate-fade-in-fast {
+  animation: fadeIn 0.15s ease-out;
+}
+
+/* Streak Flame Animation */
+@keyframes flamePop {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.streak-flame {
+  animation: flamePop 0.3s ease-out;
+}
+
+/* --- T4: Subtle Themes --- */
+.light {
+  --bg: #f8fafc;
+  --card: #ffffff;
+  --text: #0f172a;
+  --muted: #64748b;
+  --accent: #6366f1;
+  --border: #e2e8f0;
+}
+
+.focus {
+  --bg: #f1f5f9;
+  --card: #f8fafc;
+  --text: #1e293b;
+  --muted: #94a3b8;
+  --accent: #64748b;
+  --border: #e2e8f0;
+}
+
+.night {
+  --bg: #020617;
+  --card: #0f172a;
+  --text: #e5e7eb;
+  --muted: #94a3b8;
+  --accent: #818cf8;
+  --border: #1e293b;
+}
+
+/* Global variable application */
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Utility overrides for theming */
+.bg-card {
+  background-color: var(--card);
+  transition: background-color 0.3s ease;
+}
+
+.text-theme {
+  color: var(--text);
+}
+
+.border-theme {
+  border-color: var(--border);
 }
