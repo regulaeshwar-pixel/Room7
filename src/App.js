@@ -1,26 +1,9 @@
-import React, { useState, useEffect, useMemo, useRef, useReducer } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
-  CheckCircle2,
-
-  Droplets,
-  ShoppingCart,
-  Utensils,
-
-
   Calendar,
   Users,
   DollarSign,
-
-  Menu,
-  X,
-  Edit2,
-  ToggleLeft,
-  ToggleRight,
-  Bell,
-  AlertTriangle,
-  Info,
-  GripVertical,
-  PartyPopper
+  Menu
 } from 'lucide-react';
 
 import ChangeLog from './views/ChangeLog';
@@ -67,13 +50,6 @@ const DEFAULT_SCHEDULE = {
   Sunday3: { morningDish: ['m6'], nightDish: ['m3'], cleaning: ['m2', 'm7'], market: ['m4', 'm5'] },
 };
 
-const TIME_WINDOWS = {
-  cookingMorning: { start: 9, end: 13 },
-  cookingNight: { start: 20, end: 23 },
-  dishMorning: { start: 9, end: 12 },
-  dishNight: { start: 19, end: 22 },
-};
-
 const HANDLER_PIN = "2929";
 
 // --- CONSTANTS ---
@@ -90,23 +66,6 @@ const INITIAL_EXPECTED_AMOUNTS = {
 const getDayName = (date) => date.toLocaleDateString('en-US', { weekday: 'long' });
 
 // --- COMPONENTS ---
-
-const Card = ({ children, className = "", onClick }) => (
-  <div onClick={onClick} className={`bg-white rounded-[24px] shadow-[0_4px_24px_rgba(0,0,0,0.02)] border border-[#f1f5f9] overflow-hidden ${className}`}>
-    {children}
-  </div>
-);
-
-
-
-const MemberAvatar = ({ name, code, className = "", size = "md" }) => {
-  const sizeClass = size === 'sm' ? 'w-8 h-8 text-xs' : 'w-10 h-10 text-sm';
-  return (
-    <div className={`${sizeClass} rounded-full bg-slate-200 text-slate-700 flex items-center justify-center font-bold border-2 border-white shadow-sm ${className}`} title={name}>
-      {code}
-    </div>
-  );
-};
 
 const NavButton = ({ icon, label, active, onClick }) => (
   <button onClick={onClick} className={`flex flex-col items-center gap-1.5 transition-all duration-300 ${active ? 'text-slate-900 scale-105' : 'text-slate-300 hover:text-slate-500'}`}>
@@ -359,21 +318,11 @@ export default function App() {
   const isAdmin = currentUser?.id === vegHandlerId;
   const isReadOnly = isFrozen && !isAdmin;
 
-  const totalVegGiven = vegCollections.reduce((sum, c) => sum + c.amount, 0);
-  const totalVegExpenses = vegExpenses.reduce((sum, e) => sum + e.amount, 0);
-  const vegBalance = totalVegGiven - totalVegExpenses;
-
-
-
   const getTaskStatus = React.useCallback((taskId) => {
     if (tasks === null) return 'loading'; // New value
     const key = `${simulatedDate.toDateString()}-${taskId}`;
     return tasks[key]?.status || 'pending';
   }, [tasks, simulatedDate]);
-
-  const hasCompletedAllTasks = useMemo(() => {
-    return false; // Simplified
-  }, []);
 
 
   const triggerAlert = (msg, type = 'danger') => {

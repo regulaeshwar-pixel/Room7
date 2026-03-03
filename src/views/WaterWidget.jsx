@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../firebase';
-import { collection, onSnapshot, addDoc, updateDoc, doc, deleteDoc } from 'firebase/firestore';
+import { collection, onSnapshot, updateDoc, doc } from 'firebase/firestore';
 import { loadUser } from '../utils/session';
 import { haptic } from '../utils/haptics';
-import { Droplets, CheckCircle2, Clock, RefreshCw, Users, Zap } from 'lucide-react';
+import { Droplets, CheckCircle2, RefreshCw, Users } from 'lucide-react';
 
 const ROOM_ID = 'flowhouse-main';
 

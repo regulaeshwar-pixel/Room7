@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import PullToRefresh from 'react-simple-pull-to-refresh';
-import { Droplets, AlertTriangle, Undo2, CheckCircle2, Utensils, Sun, Moon, Clock, ShoppingCart, Leaf, Trash2, TrendingUp, X } from 'lucide-react';
+import { Droplets, Undo2, CheckCircle2, Utensils, Sun, Moon, Clock, ShoppingCart, Leaf, Trash2 } from 'lucide-react';
 
 import MemberAvatar from '../components/MemberAvatar';
 import MicroCheck from '../components/MicroCheck';
@@ -34,12 +34,6 @@ const TaskButton = ({ onClick, children, className, type = 'success' }) => {
     );
 };
 
-
-const StatusIndicator = ({ status, text = false }) => {
-    if (status === 'loading') return <div className="w-4 h-4 border-2 border-slate-300 border-t-indigo-500 rounded-full animate-spin" />;
-    if (status === 'done') return text ? <span className="text-xs font-bold text-emerald-600">Done</span> : <CheckCircle2 size={20} className="text-emerald-500" />;
-    return text ? <span className="text-xs text-slate-400">Pending</span> : <Clock size={20} className="text-slate-200" />;
-};
 
 const TIME_WINDOWS = {
     cookingMorning: { start: 7, end: 13 },
@@ -149,18 +143,14 @@ const DashboardView = ({
 
     const cookId = members.find(m => m.role === 'Cook')?.id;
     const isCook = currentUser.id === cookId;
-    const isHandler = currentUser.id === vegHandlerId;
 
     const cookMorningStatus = getTaskStatus('cook-morning');
     const cookNightStatus = getTaskStatus('cook-night');
-    const isMorningCookTime = currentHour >= TIME_WINDOWS.cookingMorning.start && currentHour < TIME_WINDOWS.cookingMorning.end;
-    const isNightCookTime = currentHour >= TIME_WINDOWS.cookingNight.start && currentHour < TIME_WINDOWS.cookingNight.end;
 
     // --- WATER DUTY LOGIC ---
     // 1. Current Cycle (Active Loop)
     const waterPending = waterPairs.filter(p => p.status === 'pending' && !p.archived);
     const waterDoneCycle = waterPairs.filter(p => p.status === 'done' && !p.archived);
-    const myActivePair = waterPending.find(p => p.members.includes(currentUser.id));
 
     // 2. Monthly History (Now Infinite History until Reset)
     const waterDoneList = waterPairs
@@ -176,36 +166,9 @@ const DashboardView = ({
     // Identify next members for Glow Effect (Everyone in the first pending pair)
     const nextMemberIds = waterPending.length > 0 ? waterPending[0].members : [];
 
-    const [droplets, setDroplets] = useState([]);
-
     const handleMarkWaterDone = (pairId) => {
-        // Spawn droplets
-        const newDroplets = Array.from({ length: 5 }).map((_, i) => ({
-            id: Date.now() + i,
-            left: `${20 + Math.random() * 60}%`,
-            delay: `${Math.random() * 0.2}s`,
-            size: 10 + Math.random() * 8
-        }));
-
-        setDroplets(d => [...d, ...newDroplets]);
-
-        // Remove droplets after animation
-        setTimeout(() => {
-            setDroplets(d => d.filter(drop => !newDroplets.find(nd => nd.id === drop.id)));
-        }, 1200);
-
-        // Actually mark done
         markPairDone(pairId);
     };
-
-    // Calculate dynamic wave heights based on pool size vs done
-    const totalWaterPairs = waterDoneList.length + waterPending.length;
-    let waterFillPercentage = 10; // default low
-    if (totalWaterPairs > 0) {
-        waterFillPercentage = Math.max(10, Math.min(100, Math.round((waterDoneList.length / totalWaterPairs) * 100)));
-    }
-    const waveHeight1 = `${waterFillPercentage - 10}%`;
-    const waveHeight2 = `${waterFillPercentage - 15}%`;
 
     // --- COOK DUTY LOGIC ---
     const getCookStats = () => {

@@ -9,7 +9,6 @@ import {
     Calendar,
     Cpu
 } from 'lucide-react';
-import { haptic } from '../utils/haptics';
 
 const Card = ({ children, className = "", onClick }) => (
     <div onClick={onClick} className={`rounded-[32px] shadow-[0_4px_30px_rgba(0,0,0,0.02)] border border-slate-100/50 overflow-hidden ${className}`}>
