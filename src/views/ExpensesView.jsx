@@ -210,24 +210,24 @@ const ExpensesView = ({
     };
 
     return (
-        <div className="pb-32 bg-[#fafafa]">
-            <header className="flex justify-between items-center bg-white/95 backdrop-blur-2xl p-4 sticky top-0 z-50 rounded-b-[28px] border-b border-slate-50 shadow-[0_10px_40px_rgba(0,0,0,0.02)] pt-[max(env(safe-area-inset-top),1rem)]">
+        <div className="pb-24 bg-[#fafafa]">
+            <header className="flex justify-between items-center bg-white/95 backdrop-blur-2xl p-3 sticky top-0 z-50 rounded-b-[20px] border-b border-slate-50 shadow-[0_4px_20px_rgba(0,0,0,0.02)] pt-[max(env(safe-area-inset-top),0.75rem)]">
                 <div>
-                    <h1 className="text-[20px] font-black text-slate-900 tracking-[0.4em] uppercase drop-shadow-sm flex items-center leading-none">ROOM<span className="italic ml-1 text-xl font-black text-indigo-600/90">-7</span></h1>
-                    <p className="text-[9px] text-slate-400 font-black uppercase tracking-[0.3em] mt-2 flex items-center gap-2">
-                        <Leaf size={12} strokeWidth={2.5} className="text-emerald-400/60" />
+                    <h1 className="text-[16px] font-black text-slate-900 tracking-[0.4em] uppercase drop-shadow-sm flex items-center leading-none">ROOM<span className="italic ml-1 text-lg font-black text-indigo-600/90">-7</span></h1>
+                    <p className="text-[8px] text-slate-400 font-black uppercase tracking-[0.3em] mt-1.5 flex items-center gap-2">
+                        <Leaf size={10} strokeWidth={2.5} className="text-emerald-400/60" />
                         Monthly Expenses
                     </p>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
                     <div className="relative cursor-pointer transition-transform hover:scale-105" onClick={() => document.querySelector('[aria-label="Profile"]')?.click()}>
-                        <MemberAvatar name={currentUser.name} code={currentUser.avatar} className="ring-2 ring-slate-100 shadow-sm" />
+                        <MemberAvatar name={currentUser.name} code={currentUser.avatar} size="sm" className="ring-2 ring-slate-100 shadow-sm w-8 h-8" />
                     </div>
                 </div>
             </header>
 
-            <div className="p-4 space-y-4">
-                <div className="relative overflow-hidden rounded-[28px] bg-white shadow-[0_8px_40px_rgba(0,0,0,0.03)] border border-slate-100/50 p-5 text-slate-900 group transition-all duration-1000">
+            <div className="p-3 space-y-3">
+                <div className="relative overflow-hidden rounded-[24px] bg-white shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-slate-100/50 p-4 text-slate-900 group transition-all duration-1000">
                     {/* ELITE MESH GRADIENT LAYER */}
                     <div className="absolute inset-0 pointer-events-none overflow-hidden z-0 opacity-[0.6]">
                         <div className="absolute top-[-20%] left-[-10%] w-[80%] h-[80%] rounded-full bg-indigo-100/40 blur-[100px] animate-mesh-1 mix-blend-multiply"></div>
@@ -236,33 +236,33 @@ const ExpensesView = ({
                     </div>
 
                     <div className="relative z-10 text-center">
-                        <div className="mb-4 inline-block rounded-full bg-white/40 backdrop-blur-2xl border border-white/80 px-4 py-1.5 shadow-[inset_0_1px_5px_rgba(255,255,255,0.8),0_2px_10px_rgba(0,0,0,0.02)]">
-                            <span className="text-[9px] font-black uppercase tracking-[0.4em] text-slate-400">Monthly Budget</span>
+                        <div className="mb-3 inline-block rounded-full bg-white/40 backdrop-blur-2xl border border-white/80 px-3 py-1 shadow-[inset_0_1px_3px_rgba(255,255,255,0.8),0_2px_8px_rgba(0,0,0,0.02)]">
+                            <span className="text-[8px] font-black uppercase tracking-[0.4em] text-slate-400">Monthly Budget</span>
                         </div>
-                        <h2 className="text-[36px] font-black tracking-[-0.04em] mb-2 leading-none text-slate-900 drop-shadow-sm">{formatCurrency(totalMonthlyExpenses)}</h2>
-                        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mb-6 opacity-70 flex items-center justify-center gap-2">
-                            <span className="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
+                        <h2 className="text-[28px] font-black tracking-[-0.04em] mb-2 leading-none text-slate-900 drop-shadow-sm">{formatCurrency(totalMonthlyExpenses)}</h2>
+                        <p className="text-[9px] font-black uppercase tracking-[0.3em] text-slate-400 mb-4 opacity-70 flex items-center justify-center gap-2">
+                            <span className="w-1 h-1 rounded-full bg-indigo-400"></span>
                             Total Fund
                         </p>
 
                         {!isGuest && (
                             <button
                                 onClick={() => setShowGenModal(true)}
-                                className="mx-auto px-6 py-3 bg-slate-900 text-white rounded-[20px] font-black text-[10px] tracking-[0.3em] uppercase shadow-[0_10px_25px_rgba(15,23,42,0.15)] flex items-center justify-center gap-2 hover:shadow-[0_15px_35px_rgba(15,23,42,0.25)] hover:translate-y-[-2px] transition-all duration-300 active:translate-y-[1px]"
+                                className="mx-auto px-5 py-2.5 bg-slate-900 text-white rounded-[18px] font-black text-[9px] tracking-[0.3em] uppercase shadow-[0_8px_20px_rgba(15,23,42,0.15)] flex items-center justify-center gap-2 hover:shadow-[0_12px_25px_rgba(15,23,42,0.25)] hover:translate-y-[-2px] transition-all duration-300 active:translate-y-[1px]"
                             >
-                                <Plus size={16} strokeWidth={3} /> Add Expense
+                                <Plus size={14} strokeWidth={3} /> Add Expense
                             </button>
                         )}
                     </div>
                 </div>
 
                 <div className="space-y-3">
-                    <div className="flex items-center justify-between px-2">
-                        <h3 className="text-sm font-black text-slate-800 tracking-tight flex items-center gap-2 italic uppercase"><ShoppingCart size={18} className="text-emerald-500" strokeWidth={2.5} /> General</h3>
+                    <div className="flex items-center justify-between px-1">
+                        <h3 className="text-xs font-black text-slate-800 tracking-tight flex items-center gap-2 italic uppercase"><ShoppingCart size={14} className="text-emerald-500" strokeWidth={2.5} /> General</h3>
                         {vegHandlerId ? <Badge variant="success" className="bg-emerald-500/5 text-emerald-600 border-none px-3 py-1 text-[9px] font-black tracking-widest uppercase">Verified</Badge> : <Badge variant="warning">No Handler</Badge>}
                     </div>
 
-                    <Card className="p-5 shadow-[0_4px_30px_rgba(0,0,0,0.02)] border border-slate-100/50 overflow-hidden relative">
+                    <Card className="p-4 shadow-[0_4px_20px_rgba(0,0,0,0.02)] border border-slate-100/50 overflow-hidden relative">
                         {/* Subtle Background Glow */}
                         <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-50/40 blur-[60px] rounded-full pointer-events-none -mr-10 -mt-10"></div>
 
@@ -270,24 +270,24 @@ const ExpensesView = ({
                             const grocPercent = groceriesGiven > 0 ? Math.min(100, Math.round((groceriesExpenses / groceriesGiven) * 100)) : 0;
                             return (
                                 <>
-                                    <div className="flex justify-between items-start mb-6 relative z-10">
+                                    <div className="flex justify-between items-start mb-4 relative z-10">
                                         <div>
-                                            <p className="text-[9px] text-slate-400 font-black uppercase tracking-[0.4em] mb-2">Balance</p>
-                                            <p className={`font-black tracking-[-0.03em] text-[28px] leading-none ${groceriesBalance < 0 ? 'text-rose-500' : 'text-slate-900'}`}>{formatCurrency(groceriesBalance)}</p>
+                                            <p className="text-[8px] text-slate-400 font-black uppercase tracking-[0.4em] mb-1">Balance</p>
+                                            <p className={`font-black tracking-[-0.03em] text-[24px] leading-none ${groceriesBalance < 0 ? 'text-rose-500' : 'text-slate-900'}`}>{formatCurrency(groceriesBalance)}</p>
                                         </div>
                                         <div className="text-right">
-                                            <p className="text-[9px] text-slate-400 font-black uppercase tracking-[0.4em] mb-2">Spent</p>
-                                            <p className="font-black text-slate-700 text-base leading-none">{formatCurrency(groceriesExpenses)} <span className="text-slate-300 text-xs font-black uppercase tracking-widest ml-1">/ {formatCurrency(groceriesGiven)}</span></p>
+                                            <p className="text-[8px] text-slate-400 font-black uppercase tracking-[0.4em] mb-1">Spent</p>
+                                            <p className="font-black text-slate-700 text-sm leading-none">{formatCurrency(groceriesExpenses)} <span className="text-slate-300 text-[10px] font-black uppercase tracking-widest ml-1">/ {formatCurrency(groceriesGiven)}</span></p>
                                         </div>
                                     </div>
 
-                                    <div className="mb-8 relative z-10">
-                                        <div className="flex justify-between text-[9px] font-black text-slate-400 mb-2 uppercase tracking-[0.3em]">
-                                            <span className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-emerald-400"></div> Budget Used</span>
+                                    <div className="mb-5 relative z-10">
+                                        <div className="flex justify-between text-[8px] font-black text-slate-400 mb-1 uppercase tracking-[0.3em]">
+                                            <span className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-emerald-400"></div> Budget Used</span>
                                             <span className="text-slate-900">{grocPercent}%</span>
                                         </div>
-                                        <div className="h-2 rounded-full bg-slate-50 overflow-hidden relative border border-slate-100 shadow-[inset_0_1px_3px_rgba(0,0,0,0.02)]">
-                                            <div className="absolute top-0 left-0 h-full rounded-full bg-gradient-to-r from-emerald-400 to-indigo-500 transition-all duration-1000 ease-out shadow-[0_0_10px_rgba(52,211,153,0.3)]" style={{ width: `${grocPercent}%` }} />
+                                        <div className="h-1.5 rounded-full bg-slate-50 overflow-hidden relative border border-slate-100 shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">
+                                            <div className="absolute top-0 left-0 h-full rounded-full bg-gradient-to-r from-emerald-400 to-indigo-500 transition-all duration-1000 ease-out shadow-[0_0_8px_rgba(52,211,153,0.3)]" style={{ width: `${grocPercent}%` }} />
                                         </div>
                                     </div>
                                 </>
@@ -296,16 +296,16 @@ const ExpensesView = ({
 
                         {renderCategoryList('Groceries', CATEGORY_GROCERIES)}
                         {isHandler && !isGuest && (
-                            <div className="mt-6 pt-5 border-t border-slate-100">
-                                <button onClick={() => { setVegCategory(CATEGORY_GROCERIES); setShowVegExpModal(true); }} className="w-full py-3 bg-white border border-slate-100 text-rose-500 rounded-[20px] font-black text-[10px] uppercase tracking-[0.3em] flex items-center justify-center gap-2 hover:bg-rose-50 hover:border-rose-100 transition-all duration-300 shadow-sm active:scale-95"><Minus size={14} strokeWidth={3} /> Add Expense</button>
+                            <div className="mt-5 pt-4 border-t border-slate-100">
+                                <button onClick={() => { setVegCategory(CATEGORY_GROCERIES); setShowVegExpModal(true); }} className="w-full py-2 bg-white border border-slate-100 text-rose-500 rounded-[16px] font-black text-[9px] uppercase tracking-[0.3em] flex items-center justify-center gap-1 hover:bg-rose-50 hover:border-rose-100 transition-all duration-300 shadow-sm active:scale-95"><Minus size={12} strokeWidth={3} /> Add Expense</button>
                             </div>
                         )}
                     </Card>
 
-                    <div className="flex items-center justify-between px-2 mt-6">
-                        <h3 className="text-sm font-black text-slate-800 tracking-tight flex items-center gap-2 italic uppercase"><Leaf size={18} className="text-emerald-500" strokeWidth={2.5} /> Organic</h3>
+                    <div className="flex items-center justify-between px-1 mt-5">
+                        <h3 className="text-xs font-black text-slate-800 tracking-tight flex items-center gap-2 italic uppercase"><Leaf size={14} className="text-emerald-500" strokeWidth={2.5} /> Organic</h3>
                     </div>
-                    <Card className="p-5 shadow-[0_4px_30px_rgba(0,0,0,0.02)] border border-slate-100/50 overflow-hidden relative">
+                    <Card className="p-4 shadow-[0_4px_20px_rgba(0,0,0,0.02)] border border-slate-100/50 overflow-hidden relative">
                         {/* Subtle Background Glow */}
                         <div className="absolute top-0 right-0 w-32 h-32 bg-amber-50/40 blur-[60px] rounded-full pointer-events-none -mr-10 -mt-10"></div>
 
@@ -313,24 +313,24 @@ const ExpensesView = ({
                             const vegPercent = vegOnlyGiven > 0 ? Math.min(100, Math.round((vegOnlyExpenses / vegOnlyGiven) * 100)) : 0;
                             return (
                                 <>
-                                    <div className="flex justify-between items-start mb-6 relative z-10">
+                                    <div className="flex justify-between items-start mb-4 relative z-10">
                                         <div>
-                                            <p className="text-[9px] text-slate-400 font-black uppercase tracking-[0.4em] mb-2">Balance</p>
-                                            <p className={`font-black tracking-[-0.03em] text-[28px] leading-none ${vegOnlyBalance < 0 ? 'text-rose-500' : 'text-slate-900'}`}>{formatCurrency(vegOnlyBalance)}</p>
+                                            <p className="text-[8px] text-slate-400 font-black uppercase tracking-[0.4em] mb-1">Balance</p>
+                                            <p className={`font-black tracking-[-0.03em] text-[24px] leading-none ${vegOnlyBalance < 0 ? 'text-rose-500' : 'text-slate-900'}`}>{formatCurrency(vegOnlyBalance)}</p>
                                         </div>
                                         <div className="text-right">
-                                            <p className="text-[9px] text-slate-400 font-black uppercase tracking-[0.4em] mb-2">Spent</p>
-                                            <p className="font-black text-slate-700 text-base leading-none">{formatCurrency(vegOnlyExpenses)} <span className="text-slate-300 text-xs font-black uppercase tracking-widest ml-1">/ {formatCurrency(vegOnlyGiven)}</span></p>
+                                            <p className="text-[8px] text-slate-400 font-black uppercase tracking-[0.4em] mb-1">Spent</p>
+                                            <p className="font-black text-slate-700 text-sm leading-none">{formatCurrency(vegOnlyExpenses)} <span className="text-slate-300 text-[10px] font-black uppercase tracking-widest ml-1">/ {formatCurrency(vegOnlyGiven)}</span></p>
                                         </div>
                                     </div>
 
-                                    <div className="mb-8 relative z-10">
-                                        <div className="flex justify-between text-[9px] font-black text-slate-400 mb-2 uppercase tracking-[0.3em]">
-                                            <span className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-amber-400"></div> Used</span>
+                                    <div className="mb-5 relative z-10">
+                                        <div className="flex justify-between text-[8px] font-black text-slate-400 mb-1 uppercase tracking-[0.3em]">
+                                            <span className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-amber-400"></div> Used</span>
                                             <span className="text-slate-900">{vegPercent}%</span>
                                         </div>
-                                        <div className="h-2 rounded-full bg-slate-50 overflow-hidden relative border border-slate-100 shadow-[inset_0_1px_3px_rgba(0,0,0,0.02)]">
-                                            <div className="absolute top-0 left-0 h-full rounded-full bg-gradient-to-r from-amber-400 to-emerald-500 transition-all duration-1000 ease-out shadow-[0_0_10px_rgba(251,191,36,0.3)]" style={{ width: `${vegPercent}%` }} />
+                                        <div className="h-1.5 rounded-full bg-slate-50 overflow-hidden relative border border-slate-100 shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">
+                                            <div className="absolute top-0 left-0 h-full rounded-full bg-gradient-to-r from-amber-400 to-emerald-500 transition-all duration-1000 ease-out shadow-[0_0_8px_rgba(251,191,36,0.3)]" style={{ width: `${vegPercent}%` }} />
                                         </div>
                                     </div>
                                 </>
@@ -339,17 +339,17 @@ const ExpensesView = ({
 
                         {renderCategoryList('Vegetables', CATEGORY_VEGETABLES)}
                         {isHandler && !isGuest && (
-                            <div className="mt-6 pt-5 border-t border-slate-100">
-                                <button onClick={() => { setVegCategory(CATEGORY_VEGETABLES); setShowVegExpModal(true); }} className="w-full py-3 bg-white border border-slate-100 text-rose-500 rounded-[20px] font-black text-[10px] uppercase tracking-[0.3em] flex items-center justify-center gap-2 hover:bg-rose-50 hover:border-rose-100 transition-all duration-300 shadow-sm active:scale-95"><Minus size={14} strokeWidth={3} /> Add Expense</button>
+                            <div className="mt-5 pt-4 border-t border-slate-100">
+                                <button onClick={() => { setVegCategory(CATEGORY_VEGETABLES); setShowVegExpModal(true); }} className="w-full py-2 bg-white border border-slate-100 text-rose-500 rounded-[16px] font-black text-[9px] uppercase tracking-[0.3em] flex items-center justify-center gap-1 hover:bg-rose-50 hover:border-rose-100 transition-all duration-300 shadow-sm active:scale-95"><Minus size={12} strokeWidth={3} /> Add Expense</button>
                             </div>
                         )}
                     </Card>
                 </div>
 
-                <div className="bg-white rounded-[24px] shadow-[0_4px_30px_rgba(0,0,0,0.02)] border border-slate-100/50 overflow-hidden">
-                    <div className="p-4 border-b border-slate-50 font-black text-slate-400 text-[9px] uppercase tracking-[0.4em]">Recent History (15)</div>
-                    {expenses.length === 0 && vegExpenses.length === 0 && vegCollections.length === 0 ? <div className="p-8 text-center text-slate-300 text-[10px] font-black uppercase tracking-widest italic">No transactions recorded.</div> : (
-                        <div className="divide-y divide-slate-50 max-h-[300px] overflow-y-auto pr-1 no-scrollbar">
+                <div className="bg-white rounded-[20px] shadow-[0_4px_20px_rgba(0,0,0,0.02)] border border-slate-100/50 overflow-hidden">
+                    <div className="p-3 border-b border-slate-50 font-black text-slate-400 text-[8px] uppercase tracking-[0.4em]">Recent History (15)</div>
+                    {expenses.length === 0 && vegExpenses.length === 0 && vegCollections.length === 0 ? <div className="p-6 text-center text-slate-300 text-[10px] font-black uppercase tracking-widest italic">No transactions recorded.</div> : (
+                        <div className="divide-y divide-slate-50 max-h-[260px] overflow-y-auto pr-1 no-scrollbar">
                             {[
                                 ...expenses.map(e => ({ ...e, type: 'general', collection: 'expenses', date: new Date(e.date) })),
                                 ...vegExpenses.map(e => ({ ...e, type: 'vegExp', collection: 'vegExpenses', date: new Date(e.date) })),
@@ -359,18 +359,18 @@ const ExpensesView = ({
                                 const canDelete = !isGuest; // HOTFIX: Allow all to delete
 
                                 return (
-                                    <div key={t.id} className="p-4 flex justify-between items-center group/tx hover:bg-slate-50/50 transition-all duration-300">
-                                        <div className="flex items-center gap-4">
-                                            <div className={`w-10 h-10 rounded-[14px] flex items-center justify-center transition-all duration-500 shadow-sm ${t.type === 'general' ? 'bg-indigo-50 text-indigo-500' : t.type === 'vegExp' ? 'bg-rose-50 text-rose-500' : 'bg-emerald-50 text-emerald-500'}`}>
-                                                {t.type === 'general' ? <ShoppingCart size={18} strokeWidth={2.5} /> : t.type === 'vegExp' ? <Minus size={18} strokeWidth={3} /> : <Plus size={18} strokeWidth={3} />}
+                                    <div key={t.id} className="p-3 flex justify-between items-center group/tx hover:bg-slate-50/50 transition-all duration-300">
+                                        <div className="flex items-center gap-3">
+                                            <div className={`w-9 h-9 rounded-[12px] flex items-center justify-center transition-all duration-500 shadow-sm ${t.type === 'general' ? 'bg-indigo-50 text-indigo-500' : t.type === 'vegExp' ? 'bg-rose-50 text-rose-500' : 'bg-emerald-50 text-emerald-500'}`}>
+                                                {t.type === 'general' ? <ShoppingCart size={16} strokeWidth={2.5} /> : t.type === 'vegExp' ? <Minus size={16} strokeWidth={3} /> : <Plus size={16} strokeWidth={3} />}
                                             </div>
                                             <div>
-                                                <p className="font-black text-slate-800 text-[13px] tracking-tight mb-1">
+                                                <p className="font-black text-slate-800 text-[12px] tracking-tight mb-0.5">
                                                     {t.type === 'general' ? (t.notes || 'General Expense') :
                                                         t.type === 'vegExp' ? (t.desc || 'Veg Expense') :
                                                             'Fund Contribution'}
                                                 </p>
-                                                <div className="flex items-center gap-2.5 text-[9px] text-slate-400 font-black uppercase tracking-[0.2em]">
+                                                <div className="flex items-center gap-2 text-[8px] text-slate-400 font-black uppercase tracking-[0.2em]">
                                                     <span className="text-indigo-400/80">
                                                         {t.type === 'general' ? (members.find(m => m.id === t.paidBy)?.name || 'Member') :
                                                             t.type === 'vegExp' ? 'Monthly Fund' :
@@ -381,8 +381,8 @@ const ExpensesView = ({
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="flex items-center gap-4">
-                                            <span className={`font-black text-sm tracking-tight ${t.type === 'vegCol' ? 'text-emerald-600' : 'text-slate-900'}`}>
+                                        <div className="flex items-center gap-3">
+                                            <span className={`font-black text-xs tracking-tight ${t.type === 'vegCol' ? 'text-emerald-600' : 'text-slate-900'}`}>
                                                 {t.type === 'vegCol' ? '+' : '-'}{formatCurrency(t.amount)}
                                             </span>
                                             {canDelete && (
@@ -393,10 +393,10 @@ const ExpensesView = ({
                                                             deleteTransaction(t.collection, t.id);
                                                         }
                                                     }}
-                                                    className="p-2 text-slate-200 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition-all md:opacity-0 group-hover/tx:opacity-100"
+                                                    className="p-1.5 text-slate-200 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-all md:opacity-0 group-hover/tx:opacity-100"
                                                     title="Purge"
                                                 >
-                                                    <Trash2 size={14} />
+                                                    <Trash2 size={12} />
                                                 </button>
                                             )}
                                         </div>
@@ -407,10 +407,10 @@ const ExpensesView = ({
                     )}
                 </div>
 
-                <div className="pt-4">
+                <div className="pt-3">
                     {canReset && !isGuest ? (
-                        <button onClick={() => { haptic.medium(); resetMonth(); }} className="w-full py-4 text-slate-400 hover:text-rose-500 font-black text-[10px] uppercase tracking-[0.4em] flex justify-center items-center gap-2 hover:bg-rose-50/50 rounded-[24px] border border-transparent hover:border-rose-100 transition-all duration-500"><Trash2 size={14} /> Start New Month</button>
-                    ) : <div className="text-center text-[9px] font-black text-slate-300 p-2 uppercase tracking-[0.3em]">{isGuest ? 'Authentication required for management.' : 'Authorized personnel only.'}</div>}
+                        <button onClick={() => { haptic.medium(); resetMonth(); }} className="w-full py-3 text-slate-400 hover:text-rose-500 font-black text-[9px] uppercase tracking-[0.4em] flex justify-center items-center gap-2 hover:bg-rose-50/50 rounded-[20px] border border-transparent hover:border-rose-100 transition-all duration-500"><Trash2 size={12} /> Start New Month</button>
+                    ) : <div className="text-center text-[8px] font-black text-slate-300 p-2 uppercase tracking-[0.3em]">{isGuest ? 'Authentication required for management.' : 'Authorized personnel only.'}</div>}
                 </div>
             </div>
 

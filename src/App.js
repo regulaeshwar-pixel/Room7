@@ -68,9 +68,9 @@ const getDayName = (date) => date.toLocaleDateString('en-US', { weekday: 'long' 
 // --- COMPONENTS ---
 
 const NavButton = ({ icon, label, active, onClick }) => (
-  <button onClick={onClick} className={`flex flex-col items-center gap-1 transition-all duration-300 ${active ? 'text-slate-900 scale-105' : 'text-slate-300 hover:text-slate-500'}`}>
-    <div className={`p-1.5 rounded-xl transition-colors duration-300 ${active ? 'bg-slate-100 shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)]' : 'bg-transparent'}`}>{icon}</div>
-    <span className={`text-[9px] uppercase tracking-[0.15em] transition-all duration-300 ${active ? 'font-black opacity-100' : 'font-semibold opacity-60'}`}>{label}</span>
+  <button onClick={onClick} className={`flex flex-col items-center gap-0.5 transition-all duration-300 ${active ? 'text-slate-900 scale-105' : 'text-slate-300 hover:text-slate-500'}`}>
+    <div className={`p-1 rounded-lg transition-colors duration-300 ${active ? 'bg-slate-100 shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)]' : 'bg-transparent'}`}>{icon}</div>
+    <span className={`text-[8px] uppercase tracking-[0.12em] transition-all duration-300 ${active ? 'font-black opacity-100' : 'font-semibold opacity-60'}`}>{label}</span>
   </button>
 );
 
@@ -905,11 +905,11 @@ export default function App() {
         </div>
       )}
 
-      <nav className="fixed bottom-0 max-w-md w-full bg-white/95 backdrop-blur-xl border-t border-slate-100 rounded-t-[24px] px-4 py-3 flex justify-between items-center z-20 shadow-[0_-10px_40px_rgba(0,0,0,0.03)] pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
-        <NavButton active={activeTab === 'dashboard'} onClick={() => scrollToTab('dashboard')} icon={<Menu size={20} />} label="Today" />
-        <NavButton active={activeTab === 'schedule'} onClick={() => scrollToTab('schedule')} icon={<Calendar size={20} />} label="Schedule" />
-        <NavButton active={activeTab === 'expenses'} onClick={() => scrollToTab('expenses')} icon={<DollarSign size={20} />} label="Expenses" />
-        <NavButton active={activeTab === 'settings'} onClick={() => scrollToTab('settings')} icon={<Users size={20} />} label="Profile" />
+      <nav className="fixed bottom-0 max-w-md w-full bg-white/95 backdrop-blur-xl border-t border-slate-100 rounded-t-[20px] px-3 py-2 flex justify-between items-center z-20 shadow-[0_-8px_30px_rgba(0,0,0,0.03)] pb-[calc(0.5rem+env(safe-area-inset-bottom))]">
+        <NavButton active={activeTab === 'dashboard'} onClick={() => scrollToTab('dashboard')} icon={<Menu size={18} />} label="Today" />
+        <NavButton active={activeTab === 'schedule'} onClick={() => scrollToTab('schedule')} icon={<Calendar size={18} />} label="Schedule" />
+        <NavButton active={activeTab === 'expenses'} onClick={() => scrollToTab('expenses')} icon={<DollarSign size={18} />} label="Expenses" />
+        <NavButton active={activeTab === 'settings'} onClick={() => scrollToTab('settings')} icon={<Users size={18} />} label="Profile" />
       </nav>
       {/* Global PIN Modal - Rendered outside of tabs */}
       {showPinModal && (

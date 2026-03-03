@@ -11,16 +11,16 @@ import {
 } from 'lucide-react';
 
 const Card = ({ children, className = "", onClick }) => (
-    <div onClick={onClick} className={`rounded-[32px] shadow-[0_4px_30px_rgba(0,0,0,0.02)] border border-slate-100/50 overflow-hidden ${className}`}>
+    <div onClick={onClick} className={`rounded-[24px] shadow-[0_4px_20px_rgba(0,0,0,0.02)] border border-slate-100/50 overflow-hidden ${className}`}>
         {children}
     </div>
 );
 
 const MemberAvatar = ({ name, code, className = "", size = "md", isActive = false }) => {
-    const sizeClass = size === 'xs' ? 'w-6 h-6 text-[8px]' : size === 'sm' ? 'w-10 h-10 text-[10px]' : 'w-14 h-14 text-lg';
+    const sizeClass = size === 'xs' ? 'w-5 h-5 text-[7px]' : size === 'sm' ? 'w-8 h-8 text-[9px]' : 'w-12 h-12 text-base';
     return (
-        <div className={`${sizeClass} rounded-[20px] flex items-center justify-center font-black transition-all duration-500 shadow-sm ${isActive
-            ? 'bg-indigo-600 text-white ring-4 ring-indigo-50'
+        <div className={`${sizeClass} rounded-[16px] flex items-center justify-center font-black transition-all duration-500 shadow-sm ${isActive
+            ? 'bg-indigo-600 text-white ring-2 ring-indigo-50'
             : 'bg-indigo-50 text-indigo-400'
             } ${className}`} title={name}>
             {code}
@@ -57,25 +57,25 @@ const SettingsScreen = ({
 
     return (
         <div className="min-h-screen bg-[#F8FAFC]">
-            <header className="bg-white/95 backdrop-blur-2xl p-4 sticky top-0 z-50 rounded-b-[28px] border-b border-slate-50 shadow-[0_10px_40px_rgba(0,0,0,0.02)] pt-[max(env(safe-area-inset-top),1rem)]">
-                <h1 className="text-[20px] font-black text-slate-900 tracking-[0.4em] uppercase drop-shadow-sm flex items-center leading-none">ROOM<span className="italic ml-1 text-xl font-black text-indigo-600/90">-7</span></h1>
-                <p className="text-[9px] text-slate-400 font-black uppercase tracking-[0.3em] mt-2">
+            <header className="bg-white/95 backdrop-blur-2xl p-3 sticky top-0 z-50 rounded-b-[20px] border-b border-slate-50 shadow-[0_4px_20px_rgba(0,0,0,0.02)] pt-[max(env(safe-area-inset-top),0.75rem)]">
+                <h1 className="text-[16px] font-black text-slate-900 tracking-[0.4em] uppercase drop-shadow-sm flex items-center leading-none">ROOM<span className="italic ml-1 text-lg font-black text-indigo-600/90">-7</span></h1>
+                <p className="text-[8px] text-slate-400 font-black uppercase tracking-[0.3em] mt-1.5">
                     Member Settings
                 </p>
             </header>
 
-            <div className="p-4 space-y-6 max-w-md mx-auto">
+            <div className="p-3 space-y-4 max-w-md mx-auto">
                 {/* Identity Hero */}
-                <Card className="p-5 bg-slate-900 text-white border-none shadow-xl relative overflow-hidden group">
+                <Card className="p-4 bg-slate-900 text-white border-none shadow-xl relative overflow-hidden group">
                     <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full -translate-y-16 translate-x-16 blur-3xl group-hover:bg-indigo-500/20 transition-all duration-1000"></div>
                     <div className="relative z-10 flex flex-col items-center text-center">
-                        <MemberAvatar name={currentUser.name} code={currentUser.avatar} isActive={true} size="sm" className="mb-3 scale-110" />
-                        <h2 className="text-lg font-black tracking-tight mb-0.5 text-white">{currentUser.name}</h2>
-                        <p className="text-[8px] font-black text-indigo-400 uppercase tracking-[0.3em] mb-4">{currentUser.role}</p>
+                        <MemberAvatar name={currentUser.name} code={currentUser.avatar} isActive={true} size="sm" className="mb-2.5 scale-110" />
+                        <h2 className="text-base font-black tracking-tight mb-0.5 text-white">{currentUser.name}</h2>
+                        <p className="text-[7px] font-black text-indigo-400 uppercase tracking-[0.3em] mb-3">{currentUser.role}</p>
 
                         {!isGuest && (
-                            <button onClick={logout} className="px-4 py-2 bg-rose-500 hover:bg-rose-600 text-white rounded-full text-[8px] font-black uppercase tracking-[0.2em] transition-all flex items-center gap-2 shadow-lg active:scale-95">
-                                <LogOut size={10} strokeWidth={3} /> Logout
+                            <button onClick={logout} className="px-3 py-1.5 bg-rose-500 hover:bg-rose-600 text-white rounded-full text-[7px] font-black uppercase tracking-[0.2em] transition-all flex items-center gap-1.5 shadow-lg active:scale-95">
+                                <LogOut size={9} strokeWidth={3} /> Logout
                             </button>
                         )}
                     </div>
