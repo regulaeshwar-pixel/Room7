@@ -393,7 +393,7 @@ const DashboardView = ({
                 <div className="px-4 space-y-4">
                     {isCook && renderCookTasks()}
 
-                    <div className="relative mb-6 rounded-[28px] overflow-hidden group transition-all duration-1000 bg-white shadow-[0_8px_40px_rgba(0,0,0,0.03)] border border-slate-100/50">
+                    <div className="relative mb-4 rounded-[28px] overflow-hidden group transition-all duration-1000 bg-white shadow-[0_8px_40px_rgba(0,0,0,0.03)] border border-slate-100/50">
 
                         {/* ELITE MESH GRADIENT LAYER */}
                         <div className="absolute inset-0 pointer-events-none overflow-hidden z-0 opacity-[0.4]">
@@ -405,31 +405,31 @@ const DashboardView = ({
                             )}
                         </div>
 
-                        <div className="relative z-10 p-5">
-                            <div className="flex items-center justify-between mb-6">
-                                <div className="flex items-center gap-4">
-                                    <div className={`w-11 h-11 rounded-[18px] flex items-center justify-center shadow-[inset_0_2px_10px_rgba(255,255,255,0.8),0_4px_15px_rgba(0,0,0,0.03)] border border-white/80 bg-white/40 backdrop-blur-2xl ${isWaterLow ? 'text-rose-500' : 'text-cyan-500'} transition-all duration-700`}>
-                                        <Droplets size={22} className={`${isWaterLow ? 'animate-pulse' : ''} drop-shadow-sm`} strokeWidth={2.5} />
+                        <div className="relative z-10 p-4">
+                            <div className="flex items-center justify-between mb-4">
+                                <div className="flex items-center gap-3">
+                                    <div className={`w-10 h-10 rounded-[16px] flex items-center justify-center shadow-[inset_0_2px_10px_rgba(255,255,255,0.8),0_4px_15px_rgba(0,0,0,0.03)] border border-white/80 bg-white/40 backdrop-blur-2xl ${isWaterLow ? 'text-rose-500' : 'text-cyan-500'} transition-all duration-700`}>
+                                        <Droplets size={20} className={`${isWaterLow ? 'animate-pulse' : ''} drop-shadow-sm`} strokeWidth={2.5} />
                                     </div>
                                     <div>
-                                        <h2 className="text-[22px] font-black tracking-tight text-slate-900 mb-0 leading-none">Water</h2>
+                                        <h2 className="text-[20px] font-black tracking-tight text-slate-900 mb-0 leading-none">Water</h2>
                                     </div>
                                 </div>
                                 {currentUser.id === vegHandlerId && (
-                                    <Badge variant="success" className="bg-emerald-500/5 text-emerald-600 border-emerald-500/10 uppercase tracking-[0.25em] text-[10px] font-black px-4 py-1.5 shadow-sm backdrop-blur-sm">Handler</Badge>
+                                    <Badge variant="success" className="bg-emerald-500/5 text-emerald-600 border-emerald-500/10 uppercase tracking-[0.25em] text-[9px] font-black px-3 py-1 shadow-sm backdrop-blur-sm">Handler</Badge>
                                 )}
                             </div>
 
                             {/* "Report Low Water" button removed as requested */}
 
                             {waterPending.length > 0 && (
-                                <div className="space-y-5 mb-10 relative z-10 px-0.5">
-                                    <p className="text-[11px] uppercase font-black tracking-[0.4em] text-slate-400/80 mb-6 flex items-center gap-2">
-                                        <span className="w-8 h-[1px] bg-slate-200"></span>
+                                <div className="space-y-4 mb-6 relative z-10 px-0.5">
+                                    <p className="text-[10px] uppercase font-black tracking-[0.4em] text-slate-400/80 mb-3 flex items-center gap-2">
+                                        <span className="w-6 h-[1px] bg-slate-200"></span>
                                         Active Tasks
                                     </p>
                                     {waterPending.map(pair => (
-                                        <div key={pair.id} className="bg-white/40 backdrop-blur-2xl border border-white shadow-[0_8px_30px_rgba(0,0,0,0.02)] p-5 rounded-[28px] flex flex-col sm:flex-row items-center justify-between gap-6 transition-all duration-500 hover:shadow-[0_12px_45px_rgba(0,0,0,0.04)] hover:bg-white/60 group/card border-b-4 border-b-slate-50/50">
+                                        <div key={pair.id} className="bg-white/40 backdrop-blur-2xl border border-white shadow-[0_8px_30px_rgba(0,0,0,0.02)] p-4 rounded-[22px] flex flex-col sm:flex-row items-center justify-between gap-4 transition-all duration-500 hover:shadow-[0_12px_45px_rgba(0,0,0,0.04)] hover:bg-white/60 group/card border-b-4 border-b-slate-50/50">
                                             <div className="flex items-center w-full justify-between sm:justify-start">
                                                 <div className="flex items-center gap-5">
                                                     <div className="flex -space-x-5">
@@ -475,12 +475,12 @@ const DashboardView = ({
                             {/* ... (Keep other elements styled similarly for luxury feel) ... */}
                             {/* ... (Keep other elements styled similarly for luxury feel) ... */}
                             {waterPool.length > 0 && (
-                                <div className="mb-10 relative z-10">
-                                    <p className="text-[11px] uppercase font-black tracking-[0.4em] text-slate-400/80 mb-6 flex items-center gap-2">
-                                        <span className="w-8 h-[1px] bg-slate-200"></span>
+                                <div className="mb-6 relative z-10">
+                                    <p className="text-[10px] uppercase font-black tracking-[0.4em] text-slate-400/80 mb-3 flex items-center gap-2">
+                                        <span className="w-6 h-[1px] bg-slate-200"></span>
                                         Members ({waterPool.length})
                                     </p>
-                                    <div className="flex flex-wrap gap-4 mb-8 p-1">
+                                    <div className="grid grid-cols-3 gap-2 mb-4">
                                         {waterPool.map((mid, idx) => (
                                             <PoolMember
                                                 key={mid}
@@ -496,7 +496,7 @@ const DashboardView = ({
                                         ))}
                                     </div>
                                     {waterSelection.length === 2 && (
-                                        <ActionButton onClick={createManualPair} label="Assign Team" className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-[0_15px_30px_rgba(79,70,229,0.15)] border-none text-[11px] tracking-[0.3em] uppercase font-black rounded-2xl w-full py-5 mt-4 transition-all duration-500 hover:translate-y-[-2px]" />
+                                        <ActionButton onClick={createManualPair} label="Assign Team" className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-[0_15px_30px_rgba(79,70,229,0.15)] border-none text-[11px] tracking-[0.3em] uppercase font-black rounded-2xl w-full py-4 mt-2 transition-all duration-500 hover:translate-y-[-2px]" />
                                     )}
                                 </div>
                             )}
@@ -554,20 +554,20 @@ const DashboardView = ({
 
 
 
-                    <Card className="mb-4">
-                        <div className="p-5">
-                            <div className="flex items-center justify-between mb-6">
-                                <div className="flex items-center gap-4">
-                                    <div className="w-11 h-11 rounded-[18px] flex items-center justify-center shadow-[inset_0_2px_10px_rgba(255,255,255,0.8),0_4px_15px_rgba(0,0,0,0.03)] border border-white/80 bg-white/40 backdrop-blur-2xl text-amber-500 transition-all duration-700">
-                                        <Droplets size={22} className="drop-shadow-sm" strokeWidth={2.5} />
+                    <Card className="mb-3">
+                        <div className="p-4">
+                            <div className="flex items-center justify-between mb-4">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-[16px] flex items-center justify-center shadow-[inset_0_2px_10px_rgba(255,255,255,0.8),0_4px_15px_rgba(0,0,0,0.03)] border border-white/80 bg-white/40 backdrop-blur-2xl text-amber-500 transition-all duration-700">
+                                        <Droplets size={20} className="drop-shadow-sm" strokeWidth={2.5} />
                                     </div>
                                     <div>
-                                        <h2 className="text-[22px] font-black tracking-tight text-slate-900 mb-0 leading-none">Dishes</h2>
+                                        <h2 className="text-[20px] font-black tracking-tight text-slate-900 mb-0 leading-none">Dishes</h2>
                                     </div>
                                 </div>
                             </div>
 
-                            <div className={`flex items-center justify-between p-5 rounded-[28px] mb-4 transition-all ${currentHour >= TIME_WINDOWS.dishMorning.start && currentHour < TIME_WINDOWS.dishMorning.end ? 'bg-amber-50/40 border border-amber-100 shadow-[0_8px_30px_rgba(245,158,11,0.03)]' : 'bg-white/40 backdrop-blur-md border border-slate-50 shadow-[0_4px_20px_rgba(0,0,0,0.01)]'}`}>
+                            <div className={`flex items-center justify-between p-4 rounded-[22px] mb-3 transition-all ${currentHour >= TIME_WINDOWS.dishMorning.start && currentHour < TIME_WINDOWS.dishMorning.end ? 'bg-amber-50/40 border border-amber-100 shadow-[0_8px_30px_rgba(245,158,11,0.03)]' : 'bg-white/40 backdrop-blur-md border border-slate-50 shadow-[0_4px_20px_rgba(0,0,0,0.01)]'}`}>
                                 <div className="flex items-center gap-4">
                                     <div className={currentHour >= TIME_WINDOWS.dishMorning.start && currentHour < TIME_WINDOWS.dishMorning.end ? "w-11 h-11 bg-white rounded-2xl flex items-center justify-center text-amber-500 shadow-sm border border-amber-50" : "w-11 h-11 bg-slate-50/50 rounded-2xl flex items-center justify-center text-slate-300 border border-slate-100"}><Sun size={20} /></div>
                                     <div>
@@ -591,7 +591,7 @@ const DashboardView = ({
                                 </div>
                             </div>
 
-                            <div className={`flex items-center justify-between p-5 rounded-[28px] transition-all ${currentHour >= TIME_WINDOWS.dishNight.start && currentHour < TIME_WINDOWS.dishNight.end ? 'bg-indigo-50/40 border border-indigo-100 shadow-[0_8px_30px_rgba(99,102,241,0.03)]' : 'bg-white/40 backdrop-blur-md border border-slate-50 shadow-[0_4px_20px_rgba(0,0,0,0.01)]'}`}>
+                            <div className={`flex items-center justify-between p-4 rounded-[22px] transition-all ${currentHour >= TIME_WINDOWS.dishNight.start && currentHour < TIME_WINDOWS.dishNight.end ? 'bg-indigo-50/40 border border-indigo-100 shadow-[0_8px_30px_rgba(99,102,241,0.03)]' : 'bg-white/40 backdrop-blur-md border border-slate-50 shadow-[0_4px_20px_rgba(0,0,0,0.01)]'}`}>
                                 <div className="flex items-center gap-4">
                                     <div className={currentHour >= TIME_WINDOWS.dishNight.start && currentHour < TIME_WINDOWS.dishNight.end ? "w-11 h-11 bg-white rounded-2xl flex items-center justify-center text-indigo-500 shadow-sm border border-indigo-50" : "w-11 h-11 bg-slate-50/50 rounded-2xl flex items-center justify-center text-slate-300 border border-slate-100"}><Moon size={20} /></div>
                                     <div>
