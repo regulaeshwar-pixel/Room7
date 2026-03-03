@@ -226,50 +226,50 @@ const DashboardView = ({
 
         return (
             <Card className="mb-4">
-                <div className="p-7">
-                    <div className="flex items-center justify-between mb-10">
-                        <h2 className="text-[28px] font-black tracking-tight text-slate-900 mb-0 leading-none flex items-center gap-5">
-                            <div className="w-14 h-14 rounded-[22px] flex items-center justify-center shadow-[inset_0_2px_10px_rgba(255,255,255,0.8),0_4px_15px_rgba(0,0,0,0.03)] border border-white/80 bg-white/40 backdrop-blur-2xl text-indigo-500 transition-all duration-700">
-                                <Utensils size={28} className="drop-shadow-sm" strokeWidth={2.5} />
+                <div className="p-5">
+                    <div className="flex items-center justify-between mb-6">
+                        <h2 className="text-[22px] font-black tracking-tight text-slate-900 mb-0 leading-none flex items-center gap-4">
+                            <div className="w-11 h-11 rounded-[18px] flex items-center justify-center shadow-[inset_0_2px_10px_rgba(255,255,255,0.8),0_4px_15px_rgba(0,0,0,0.03)] border border-white/80 bg-white/40 backdrop-blur-2xl text-indigo-500 transition-all duration-700">
+                                <Utensils size={22} className="drop-shadow-sm" strokeWidth={2.5} />
                             </div>
                             Cooking
                         </h2>
-                        <Badge variant="warning" className="uppercase tracking-[0.3em] text-[10px] font-black px-4 py-1.5 bg-indigo-500/5 text-indigo-600 border border-indigo-500/10 rounded-full shadow-sm backdrop-blur-sm">Primary</Badge>
+                        <Badge variant="warning" className="uppercase tracking-[0.3em] text-[10px] font-black px-3 py-1 bg-indigo-500/5 text-indigo-600 border border-indigo-500/10 rounded-full shadow-sm backdrop-blur-sm">Primary</Badge>
                     </div>
 
-                    <div className="space-y-4">
+                    <div className="space-y-3">
                         {/* Morning Cooking */}
-                        <div className={`p-5 rounded-[28px] flex flex-col gap-4 transition-all ${displayMorningStatus === 'completed' ? 'bg-emerald-50/20 border border-emerald-100/50' : 'bg-white/40 backdrop-blur-md border border-slate-50 shadow-[0_4px_20px_rgba(0,0,0,0.01)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.03)]'}`}>
+                        <div className={`p-4 rounded-[22px] flex flex-col gap-3 transition-all ${displayMorningStatus === 'completed' ? 'bg-emerald-50/20 border border-emerald-100/50' : 'bg-white/40 backdrop-blur-md border border-slate-50 shadow-[0_4px_20px_rgba(0,0,0,0.01)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.03)]'}`}>
                             <div className="flex items-center justify-between">
-                                <span className="text-[11px] font-black uppercase tracking-[0.35em] text-slate-400">Morning Tasks</span>
-                                {displayMorningStatus === 'completed' ? <Badge variant="success" className="bg-emerald-500/10 text-emerald-600 border-none px-3 text-[10px] font-black">ACTIVE</Badge> :
-                                    displayMorningStatus === 'missed' ? <Badge variant="danger" className="bg-rose-50 text-rose-600 border-none px-3 text-[10px] font-black">MISSED</Badge> :
-                                        <Badge variant="warning" className="bg-slate-50 text-slate-400 border-none uppercase tracking-[0.2em] text-[10px] font-black px-3">PENDING</Badge>}
+                                <span className="text-[10px] font-black uppercase tracking-[0.35em] text-slate-400">Morning Tasks</span>
+                                {displayMorningStatus === 'completed' ? <Badge variant="success" className="bg-emerald-500/10 text-emerald-600 border-none px-3 text-[9px] font-black">ACTIVE</Badge> :
+                                    displayMorningStatus === 'missed' ? <Badge variant="danger" className="bg-rose-50 text-rose-600 border-none px-3 text-[9px] font-black">MISSED</Badge> :
+                                        <Badge variant="warning" className="bg-slate-50 text-slate-400 border-none uppercase tracking-[0.2em] text-[9px] font-black px-3">PENDING</Badge>}
                             </div>
                             <div className="flex items-center justify-between mt-1">
-                                <span className="text-base font-black text-slate-800 tracking-tight">Main Hand Prepared</span>
+                                <span className="text-sm font-black text-slate-800 tracking-tight">Main Hand Prepared</span>
                                 {displayMorningStatus !== 'completed' ? (
-                                    <TaskButton onClick={() => markCookTask('cook-morning', 'cooked')} className="px-6 py-2.5 bg-indigo-600 text-white text-[11px] font-black tracking-widest uppercase rounded-2xl hover:bg-indigo-700 hover:scale-[1.02] shadow-[0_8px_20px_rgba(99,102,241,0.2)] transition-all flex items-center gap-2">Done</TaskButton>
+                                    <TaskButton onClick={() => markCookTask('cook-morning', 'cooked')} className="px-5 py-2 bg-indigo-600 text-white text-[10px] font-black tracking-widest uppercase rounded-xl hover:bg-indigo-700 hover:scale-[1.02] shadow-[0_8px_20px_rgba(99,102,241,0.2)] transition-all flex items-center gap-2">Done</TaskButton>
                                 ) : (
-                                    <TaskButton type="undo" onClick={() => markCookTask('cook-morning', 'pending')} className="px-4 py-2 bg-white/80 border border-slate-100 text-slate-400 text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-white hover:text-slate-600 transition-colors">Revert</TaskButton>
+                                    <TaskButton type="undo" onClick={() => markCookTask('cook-morning', 'pending')} className="px-3 py-1.5 bg-white/80 border border-slate-100 text-slate-400 text-[9px] font-black uppercase tracking-widest rounded-lg hover:bg-white hover:text-slate-600 transition-colors">Revert</TaskButton>
                                 )}
                             </div>
                         </div>
 
                         {/* Night Cooking */}
-                        <div className={`p-5 rounded-[28px] flex flex-col gap-4 transition-all ${displayNightStatus === 'completed' ? 'bg-emerald-50/20 border border-emerald-100/50' : 'bg-white/40 backdrop-blur-md border border-slate-50 shadow-[0_4px_20px_rgba(0,0,0,0.01)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.03)]'}`}>
+                        <div className={`p-4 rounded-[22px] flex flex-col gap-3 transition-all ${displayNightStatus === 'completed' ? 'bg-emerald-50/20 border border-emerald-100/50' : 'bg-white/40 backdrop-blur-md border border-slate-50 shadow-[0_4px_20px_rgba(0,0,0,0.01)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.03)]'}`}>
                             <div className="flex items-center justify-between">
-                                <span className="text-[11px] font-black uppercase tracking-[0.35em] text-slate-400">Night Tasks</span>
-                                {displayNightStatus === 'completed' ? <Badge variant="success" className="bg-emerald-500/10 text-emerald-600 border-none px-3 text-[10px] font-black">ACTIVE</Badge> :
-                                    displayNightStatus === 'missed' ? <Badge variant="danger" className="bg-rose-50 text-rose-600 border-none px-3 text-[10px] font-black">MISSED</Badge> :
-                                        <Badge variant="warning" className="bg-slate-50 text-slate-400 border-none uppercase tracking-[0.2em] text-[10px] font-black px-3">PENDING</Badge>}
+                                <span className="text-[10px] font-black uppercase tracking-[0.35em] text-slate-400">Night Tasks</span>
+                                {displayNightStatus === 'completed' ? <Badge variant="success" className="bg-emerald-500/10 text-emerald-600 border-none px-3 text-[9px] font-black">ACTIVE</Badge> :
+                                    displayNightStatus === 'missed' ? <Badge variant="danger" className="bg-rose-50 text-rose-600 border-none px-3 text-[9px] font-black">MISSED</Badge> :
+                                        <Badge variant="warning" className="bg-slate-50 text-slate-400 border-none uppercase tracking-[0.2em] text-[9px] font-black px-3">PENDING</Badge>}
                             </div>
                             <div className="flex items-center justify-between mt-1">
-                                <span className="text-base font-black text-slate-800 tracking-tight">Dinner Cycle Executed</span>
+                                <span className="text-sm font-black text-slate-800 tracking-tight">Dinner Cycle Executed</span>
                                 {displayNightStatus !== 'completed' ? (
-                                    <TaskButton onClick={() => markCookTask('cook-night', 'cooked')} className="px-6 py-2.5 bg-indigo-600 text-white text-[11px] font-black tracking-widest uppercase rounded-2xl hover:bg-indigo-700 hover:scale-[1.02] shadow-[0_8px_20px_rgba(99,102,241,0.2)] transition-all flex items-center gap-2">Done</TaskButton>
+                                    <TaskButton onClick={() => markCookTask('cook-night', 'cooked')} className="px-5 py-2 bg-indigo-600 text-white text-[10px] font-black tracking-widest uppercase rounded-xl hover:bg-indigo-700 hover:scale-[1.02] shadow-[0_8px_20px_rgba(99,102,241,0.2)] transition-all flex items-center gap-2">Done</TaskButton>
                                 ) : (
-                                    <TaskButton type="undo" onClick={() => markCookTask('cook-night', 'pending')} className="px-4 py-2 bg-white/80 border border-slate-100 text-slate-400 text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-white hover:text-slate-600 transition-colors">Revert</TaskButton>
+                                    <TaskButton type="undo" onClick={() => markCookTask('cook-night', 'pending')} className="px-3 py-1.5 bg-white/80 border border-slate-100 text-slate-400 text-[9px] font-black uppercase tracking-widest rounded-lg hover:bg-white hover:text-slate-600 transition-colors">Revert</TaskButton>
                                 )}
                             </div>
                         </div>
@@ -368,10 +368,10 @@ const DashboardView = ({
                         { label: "Cancel", onClick: () => { } },
                     ]}
                 />
-                <header className="flex justify-between items-center bg-white/95 backdrop-blur-2xl p-6 sticky top-0 z-50 rounded-b-[42px] border-b border-slate-50 shadow-[0_10px_40px_rgba(0,0,0,0.02)] pt-[max(env(safe-area-inset-top),1.5rem)]">
+                <header className="flex justify-between items-center bg-white/95 backdrop-blur-2xl p-4 sticky top-0 z-50 rounded-b-[28px] border-b border-slate-50 shadow-[0_10px_40px_rgba(0,0,0,0.02)] pt-[max(env(safe-area-inset-top),1rem)]">
                     <div>
-                        <h1 className="text-[26px] font-black text-slate-900 tracking-[0.4em] uppercase drop-shadow-sm flex items-center leading-none">ROOM<span className="italic ml-1 text-3xl font-black text-indigo-600/90">-7</span></h1>
-                        <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.3em] mt-3 flex items-center gap-2">
+                        <h1 className="text-[20px] font-black text-slate-900 tracking-[0.4em] uppercase drop-shadow-sm flex items-center leading-none">ROOM<span className="italic ml-1 text-xl font-black text-indigo-600/90">-7</span></h1>
+                        <p className="text-[9px] text-slate-400 font-black uppercase tracking-[0.3em] mt-2 flex items-center gap-2">
                             <Clock size={12} strokeWidth={2.5} className="text-indigo-400/60" />
                             {simulatedDate.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })} · {simulatedDate.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}
                         </p>
@@ -393,7 +393,7 @@ const DashboardView = ({
                 <div className="px-4 space-y-4">
                     {isCook && renderCookTasks()}
 
-                    <div className="relative mb-8 rounded-[38px] overflow-hidden group transition-all duration-1000 bg-white shadow-[0_8px_40px_rgba(0,0,0,0.03)] border border-slate-100/50">
+                    <div className="relative mb-6 rounded-[28px] overflow-hidden group transition-all duration-1000 bg-white shadow-[0_8px_40px_rgba(0,0,0,0.03)] border border-slate-100/50">
 
                         {/* ELITE MESH GRADIENT LAYER */}
                         <div className="absolute inset-0 pointer-events-none overflow-hidden z-0 opacity-[0.4]">
@@ -405,14 +405,14 @@ const DashboardView = ({
                             )}
                         </div>
 
-                        <div className="relative z-10 p-7">
-                            <div className="flex items-center justify-between mb-10">
-                                <div className="flex items-center gap-5">
-                                    <div className={`w-14 h-14 rounded-[22px] flex items-center justify-center shadow-[inset_0_2px_10px_rgba(255,255,255,0.8),0_4px_15px_rgba(0,0,0,0.03)] border border-white/80 bg-white/40 backdrop-blur-2xl ${isWaterLow ? 'text-rose-500' : 'text-cyan-500'} transition-all duration-700`}>
-                                        <Droplets size={28} className={`${isWaterLow ? 'animate-pulse' : ''} drop-shadow-sm`} strokeWidth={2.5} />
+                        <div className="relative z-10 p-5">
+                            <div className="flex items-center justify-between mb-6">
+                                <div className="flex items-center gap-4">
+                                    <div className={`w-11 h-11 rounded-[18px] flex items-center justify-center shadow-[inset_0_2px_10px_rgba(255,255,255,0.8),0_4px_15px_rgba(0,0,0,0.03)] border border-white/80 bg-white/40 backdrop-blur-2xl ${isWaterLow ? 'text-rose-500' : 'text-cyan-500'} transition-all duration-700`}>
+                                        <Droplets size={22} className={`${isWaterLow ? 'animate-pulse' : ''} drop-shadow-sm`} strokeWidth={2.5} />
                                     </div>
                                     <div>
-                                        <h2 className="text-[28px] font-black tracking-tight text-slate-900 mb-0 leading-none">Water</h2>
+                                        <h2 className="text-[22px] font-black tracking-tight text-slate-900 mb-0 leading-none">Water</h2>
                                     </div>
                                 </div>
                                 {currentUser.id === vegHandlerId && (
@@ -555,14 +555,14 @@ const DashboardView = ({
 
 
                     <Card className="mb-4">
-                        <div className="p-7">
-                            <div className="flex items-center justify-between mb-10">
-                                <div className="flex items-center gap-5">
-                                    <div className="w-14 h-14 rounded-[22px] flex items-center justify-center shadow-[inset_0_2px_10px_rgba(255,255,255,0.8),0_4px_15px_rgba(0,0,0,0.03)] border border-white/80 bg-white/40 backdrop-blur-2xl text-amber-500 transition-all duration-700">
-                                        <Droplets size={28} className="drop-shadow-sm" strokeWidth={2.5} />
+                        <div className="p-5">
+                            <div className="flex items-center justify-between mb-6">
+                                <div className="flex items-center gap-4">
+                                    <div className="w-11 h-11 rounded-[18px] flex items-center justify-center shadow-[inset_0_2px_10px_rgba(255,255,255,0.8),0_4px_15px_rgba(0,0,0,0.03)] border border-white/80 bg-white/40 backdrop-blur-2xl text-amber-500 transition-all duration-700">
+                                        <Droplets size={22} className="drop-shadow-sm" strokeWidth={2.5} />
                                     </div>
                                     <div>
-                                        <h2 className="text-[28px] font-black tracking-tight text-slate-900 mb-0 leading-none">Dishes</h2>
+                                        <h2 className="text-[22px] font-black tracking-tight text-slate-900 mb-0 leading-none">Dishes</h2>
                                     </div>
                                 </div>
                             </div>
@@ -617,26 +617,26 @@ const DashboardView = ({
                         </div>
                     </Card>
 
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 gap-3">
                         <Card className={`relative overflow-hidden transition-all group ${recentlyUpdatedFields.includes('schedule') ? 'scale-[1.02] shadow-[0_15px_40px_rgba(16,185,129,0.1)] ring-1 ring-emerald-100' : 'hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(0,0,0,0.03)]'}`}>
-                            <div className="p-6">
-                                <p className="text-[10px] font-black uppercase tracking-[0.4em] text-emerald-500/80 mb-5 flex items-center gap-2">
+                            <div className="p-4">
+                                <p className="text-[9px] font-black uppercase tracking-[0.4em] text-emerald-500/80 mb-3 flex items-center gap-2">
                                     <span className="w-4 h-[1px] bg-emerald-100"></span>
                                     Cleaning
                                 </p>
-                                <div className="flex -space-x-4 overflow-hidden mb-6 pl-1">
+                                <div className="flex -space-x-3 overflow-hidden mb-4 pl-1">
                                     {dailySchedule.cleaning?.map(id => {
                                         const m = members.find(mem => mem.id === id);
                                         const isExempt = exemptMembers.includes(id);
                                         return (
-                                            <div key={id} className="relative shadow-md rounded-full ring-4 ring-white transition-all group-hover:scale-110">
-                                                <MemberAvatar name={m?.name} code={m?.avatar} className={`w-11 h-11 ${isExempt ? 'opacity-30 grayscale blur-[1px]' : ''}`} />
-                                                {isExempt && <div className="absolute -bottom-1 -right-1 bg-amber-500 rounded-full w-3.5 h-3.5 border-[2px] border-white shadow-sm" />}
+                                            <div key={id} className="relative shadow-md rounded-full ring-2 ring-white transition-all group-hover:scale-110">
+                                                <MemberAvatar name={m?.name} code={m?.avatar} className={`w-9 h-9 ${isExempt ? 'opacity-30 grayscale blur-[1px]' : ''}`} />
+                                                {isExempt && <div className="absolute -bottom-1 -right-1 bg-amber-500 rounded-full w-3 h-3 border-[2px] border-white shadow-sm" />}
                                             </div>
                                         );
                                     })}
                                 </div>
-                                <div className="text-[11px] text-slate-500 font-black tracking-tight leading-relaxed max-w-[90%]">
+                                <div className="text-[10px] text-slate-500 font-black tracking-tight leading-relaxed max-w-[90%]">
                                     {dailySchedule.cleaning?.map((id, i) => {
                                         const m = members.find(mem => mem.id === id);
                                         return <span key={id} className={exemptMembers.includes(id) ? "opacity-30 line-through mr-1" : "mr-1"}>{m?.name}{i < dailySchedule.cleaning.length - 1 ? ',' : ''}</span>;
@@ -646,26 +646,26 @@ const DashboardView = ({
                         </Card>
 
                         <Card className={`relative overflow-hidden transition-all group ${recentlyUpdatedFields.includes('schedule') ? 'scale-[1.02] shadow-[0_15px_40px_rgba(59,130,246,0.1)] ring-1 ring-blue-100' : 'hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(0,0,0,0.03)]'}`}>
-                            <div className="p-6">
-                                <p className="text-[10px] font-black uppercase tracking-[0.4em] text-blue-500/80 mb-5 flex items-center gap-2">
+                            <div className="p-4">
+                                <p className="text-[9px] font-black uppercase tracking-[0.4em] text-blue-500/80 mb-3 flex items-center gap-2">
                                     <span className="w-4 h-[1px] bg-blue-100"></span>
                                     Market
                                 </p>
                                 {dailySchedule.market && dailySchedule.market.length > 0 ? (
                                     <>
-                                        <div className="flex -space-x-4 overflow-hidden mb-6 pl-1">
+                                        <div className="flex -space-x-3 overflow-hidden mb-4 pl-1">
                                             {dailySchedule.market?.map(id => {
                                                 const m = members.find(mem => mem.id === id);
                                                 const isExempt = exemptMembers.includes(id);
                                                 return (
-                                                    <div key={id} className="relative shadow-md rounded-full ring-4 ring-white transition-all group-hover:scale-110">
-                                                        <MemberAvatar name={m?.name} code={m?.avatar} className={`w-11 h-11 ${isExempt ? 'opacity-30 grayscale blur-[1px]' : ''}`} />
-                                                        {isExempt && <div className="absolute -bottom-1 -right-1 bg-amber-500 rounded-full w-3.5 h-3.5 border-[2px] border-white shadow-sm" />}
+                                                    <div key={id} className="relative shadow-md rounded-full ring-2 ring-white transition-all group-hover:scale-110">
+                                                        <MemberAvatar name={m?.name} code={m?.avatar} className={`w-9 h-9 ${isExempt ? 'opacity-30 grayscale blur-[1px]' : ''}`} />
+                                                        {isExempt && <div className="absolute -bottom-1 -right-1 bg-amber-500 rounded-full w-3 h-3 border-[2px] border-white shadow-sm" />}
                                                     </div>
                                                 );
                                             })}
                                         </div>
-                                        <div className="text-[11px] text-slate-500 font-black tracking-tight leading-relaxed max-w-[90%]">
+                                        <div className="text-[10px] text-slate-500 font-black tracking-tight leading-relaxed max-w-[90%]">
                                             {dailySchedule.market?.map((id, i) => {
                                                 const m = members.find(mem => mem.id === id);
                                                 return <span key={id} className={exemptMembers.includes(id) ? "opacity-30 line-through mr-1" : "mr-1"}>{m?.name}{i < dailySchedule.market.length - 1 ? ',' : ''}</span>;
@@ -673,9 +673,9 @@ const DashboardView = ({
                                         </div>
                                     </>
                                 ) : (
-                                    <div className="flex flex-col items-start gap-4 h-full min-h-[100px]">
-                                        <div className="w-11 h-11 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-200 border border-slate-100/50"><ShoppingCart size={20} /></div>
-                                        <p className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-300 mt-2">Dormant</p>
+                                    <div className="flex flex-col items-start gap-3 h-full min-h-[80px]">
+                                        <div className="w-9 h-9 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-200 border border-slate-100/50"><ShoppingCart size={18} /></div>
+                                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-300 mt-1">Dormant</p>
                                     </div>
                                 )}
                             </div>
