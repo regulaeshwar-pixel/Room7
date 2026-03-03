@@ -51,7 +51,7 @@ const PoolMember = ({ mid, members, waterSelection, onToggle, onLongPress, isExe
         <button
             {...handlers}
             style={{ animationDelay: `${index * 50}ms` }}
-            className={`flex items-center justify-between gap-1 px-2 py-1.5 rounded-full border transition-all duration-500 animate-in fade-in zoom-in-95 fill-mode-both group relative ${isSelected
+            className={`flex flex-col items-center justify-center gap-1 px-1 py-2 rounded-2xl border transition-all duration-500 animate-in fade-in zoom-in-95 fill-mode-both group relative ${isSelected
                 ? 'bg-indigo-600 text-white border-indigo-500 shadow-[0_10px_30px_rgba(79,70,229,0.25)] scale-105 z-20'
                 : 'bg-white/40 backdrop-blur-md border-white/80 text-slate-500 hover:bg-white/80 hover:text-slate-800 hover:shadow-[0_8px_25px_rgba(0,0,0,0.04)] hover:-translate-y-1'
                 } ${isExempt ? 'opacity-30 grayscale blur-[0.5px]' : ''}`}
@@ -59,10 +59,10 @@ const PoolMember = ({ mid, members, waterSelection, onToggle, onLongPress, isExe
             {/* Glossy overlay for unselected */}
             {!isSelected && <div className="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>}
 
-            <div className="flex items-center gap-1.5 relative z-10">
+            <div className="relative z-10">
                 <MemberAvatar
                     size="sm"
-                    className={`w-7 h-7 text-[10px] font-black transition-transform duration-500 group-hover:scale-110 ${isSelected
+                    className={`w-8 h-8 text-[10px] font-black transition-transform duration-500 group-hover:scale-110 ${isSelected
                         ? '!bg-white !text-indigo-600 !ring-0'
                         : '!bg-indigo-50/50 !text-indigo-400'
                         }`}
@@ -71,17 +71,17 @@ const PoolMember = ({ mid, members, waterSelection, onToggle, onLongPress, isExe
                 {isExempt && <div className="absolute -bottom-0.5 -right-0.5 bg-rose-500 rounded-full w-2 h-2 border border-white shadow-sm" />}
             </div>
 
-            <span className="text-[11px] font-black tracking-tight leading-none relative z-10 truncate">{member?.name}</span>
+            <span className="text-[10px] font-black tracking-tight leading-tight relative z-10 text-center px-1 truncate w-full">{member?.name}</span>
 
             {completionCount > 0 && (
-                <div className={`text-[9px] font-black px-1.5 py-0.5 rounded-full shadow-sm relative z-10 flex-shrink-0 ${isSelected ? 'bg-white text-indigo-600' : 'bg-slate-100 text-slate-500'
+                <div className={`text-[9px] font-black px-2 py-0.5 rounded-full shadow-sm relative z-10 ${isSelected ? 'bg-white text-indigo-600' : 'bg-slate-100 text-slate-500'
                     }`}>
                     {completionCount}
                 </div>
             )}
 
             {/* Active Glow Effect */}
-            {isSelected && <div className="absolute inset-0 bg-indigo-400/20 blur-xl animate-pulse -z-10"></div>}
+            {isSelected && <div className="absolute inset-0 bg-indigo-400/20 blur-xl animate-pulse -z-10 rounded-2xl"></div>}
         </button>
     );
 };
