@@ -71,7 +71,7 @@ const PoolMember = ({ mid, members, waterSelection, onToggle, onLongPress, isExe
                 {isExempt && <div className="absolute -bottom-0.5 -right-0.5 bg-rose-500 rounded-full w-2 h-2 border border-white shadow-sm" />}
             </div>
 
-            <span className="text-[11px] font-black tracking-tight leading-none relative z-10 truncate max-w-[50px]">{member?.name}</span>
+            <span className="text-[11px] font-black tracking-tight leading-none relative z-10 truncate">{member?.name}</span>
 
             {completionCount > 0 && (
                 <div className={`text-[9px] font-black px-1.5 py-0.5 rounded-full shadow-sm relative z-10 flex-shrink-0 ${isSelected ? 'bg-white text-indigo-600' : 'bg-slate-100 text-slate-500'
