@@ -4,14 +4,14 @@ import { X, Clock } from 'lucide-react';
 export default function ChangeLog({ changeLog = [], onClose }) {
     return (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-2xl w-full max-w-md max-h-[80vh] flex flex-col shadow-2xl">
-                <header className="flex justify-between items-center p-4 border-b border-slate-100">
+            <div className="bg-card rounded-2xl w-full max-w-md max-h-[80vh] flex flex-col shadow-2xl">
+                <header className="flex justify-between items-center p-4 border-b border-theme">
                     <div className="flex items-center gap-2">
-                        <Clock size={20} className="text-slate-500" />
+                        <Clock size={20} className="text-muted" />
                         <h2 className="font-bold text-theme">Activity Log</h2>
                     </div>
                     <button onClick={onClose} className="p-2 hover:bg-slate-100 rounded-full transition-colors">
-                        <X size={20} className="text-slate-500" />
+                        <X size={20} className="text-muted" />
                     </button>
                 </header>
 

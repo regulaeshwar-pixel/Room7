@@ -26,8 +26,10 @@ import {
 import ChangeLog from './views/ChangeLog';
 import DashboardView from './views/DashboardView';
 import ExpensesView from './views/ExpensesView';
+import ScheduleView from './views/ScheduleView';
 import SettingsScreen from './views/SettingsScreen';
-import MonthlySummary from './views/MonthlySummary';
+import WaterWidget from './views/WaterWidget';
+
 import MemberLogin from './views/MemberLogin';
 import useAuth from './hooks/useAuth';
 import { saveUser, loadUser, clearUser } from './utils/session';
@@ -82,349 +84,38 @@ const INITIAL_EXPECTED_AMOUNTS = {
   [CATEGORY_VEGETABLES]: 500,
 };
 
-// --- NOTIFICATION CONSTANTS ---
-const NOTIFICATION_TYPES = {
-  LOW_WATER: 'LOW_WATER',
-  VEG_NEGATIVE: 'VEG_NEGATIVE',
-  COOKING_DELAYED: 'COOKING_DELAYED',
-  WATER_DUTY: 'WATER_DUTY',
-  COOKING_PENDING: 'COOKING_PENDING',
-  DISH: 'DISH',
-  CLEANING: 'CLEANING',
-  MARKET: 'MARKET',
-  COOKING_WINDOW: 'COOKING_WINDOW',
-  UPCOMING_DUTY: 'UPCOMING_DUTY',
-  VEG_LOW: 'VEG_LOW',
-  FINANCE_INFO: 'FINANCE_INFO',
-  GROUP_SOCIAL: 'GROUP_SOCIAL',
-  TRANSIENT: 'TRANSIENT',
-};
-
-const NOTIFICATION_PRIORITY = [
-  NOTIFICATION_TYPES.LOW_WATER,
-  NOTIFICATION_TYPES.VEG_NEGATIVE,
-  NOTIFICATION_TYPES.COOKING_DELAYED,
-  NOTIFICATION_TYPES.WATER_DUTY,
-  NOTIFICATION_TYPES.COOKING_PENDING,
-  NOTIFICATION_TYPES.DISH,
-  NOTIFICATION_TYPES.CLEANING,
-  NOTIFICATION_TYPES.MARKET,
-  NOTIFICATION_TYPES.COOKING_WINDOW,
-  NOTIFICATION_TYPES.UPCOMING_DUTY,
-  NOTIFICATION_TYPES.VEG_LOW,
-  NOTIFICATION_TYPES.FINANCE_INFO,
-  NOTIFICATION_TYPES.GROUP_SOCIAL,
-];
-
 // --- UTILITY FUNCTIONS ---
 
 
 const getDayName = (date) => date.toLocaleDateString('en-US', { weekday: 'long' });
 
-// --- REDUCER FOR NOTIFICATIONS ---
-
-const initialNotificationState = {
-  persistent: [],
-  transient: null,
-  dismissed: {},
-  ready: false,
-  devMode: false,
-};
-
-function notificationReducer(state, action) {
-  switch (action.type) {
-    case 'READY':
-      return { ...state, ready: true };
-    case 'SET_PERSISTENT':
-      return { ...state, persistent: action.payload };
-    case 'SHOW_TRANSIENT':
-      return { ...state, transient: action.payload };
-    case 'CLEAR_TRANSIENT':
-      return { ...state, transient: null };
-    case 'DISMISS':
-      return {
-        ...state,
-        dismissed: {
-          ...state.dismissed,
-          [action.payload.type]: Date.now() + action.payload.ttl,
-        },
-      };
-    case 'TOGGLE_DEV_MODE':
-      return { ...state, devMode: !state.devMode };
-    case 'RESET':
-      return { ...initialNotificationState, ready: state.ready, devMode: state.devMode };
-    default:
-      return state;
-  }
-}
-
 // --- COMPONENTS ---
 
 const Card = ({ children, className = "", onClick }) => (
-  <div onClick={onClick} className={`bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden ${className}`}>
+  <div onClick={onClick} className={`bg-white rounded-[24px] shadow-[0_4px_24px_rgba(0,0,0,0.02)] border border-[#f1f5f9] overflow-hidden ${className}`}>
     {children}
   </div>
 );
 
 
 
-const MemberAvatar = ({ name, code, size = 'sm', className = '' }) => {
+const MemberAvatar = ({ name, code, className = "", size = "md" }) => {
   const sizeClass = size === 'sm' ? 'w-8 h-8 text-xs' : 'w-10 h-10 text-sm';
   return (
-    <div className={`${sizeClass} rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold border-2 border-white shadow-sm ${className}`} title={name}>
+    <div className={`${sizeClass} rounded-full bg-slate-200 text-slate-700 flex items-center justify-center font-bold border-2 border-white shadow-sm ${className}`} title={name}>
       {code}
     </div>
   );
 };
 
-const NavButton = ({ active, onClick, icon, label }) => (
-  <button onClick={onClick} className={`flex flex-col items-center gap-1 transition-colors ${active ? 'text-indigo-600' : 'text-slate-400 hover:text-slate-600'}`}>
-    {icon}<span className="text-[10px] font-medium">{label}</span>
+const NavButton = ({ icon, label, active, onClick }) => (
+  <button onClick={onClick} className={`flex flex-col items-center gap-1.5 transition-all duration-300 ${active ? 'text-slate-900 scale-105' : 'text-slate-300 hover:text-slate-500'}`}>
+    <div className={`p-2 rounded-2xl transition-colors duration-300 ${active ? 'bg-slate-100 shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)]' : 'bg-transparent'}`}>{icon}</div>
+    <span className={`text-[10px] uppercase tracking-[0.2em] transition-all duration-300 ${active ? 'font-black opacity-100' : 'font-semibold opacity-60'}`}>{label}</span>
   </button>
 );
 
 
-
-// --- SWIPEABLE NOTIFICATION COMPONENT ---
-
-const SwipeableNotification = ({ alert, onDismiss }) => {
-  const [translateX, setTranslateX] = useState(0);
-  const [opacity, setOpacity] = useState(1);
-  const startX = useRef(null);
-  const isDragging = useRef(false);
-
-  const handleTouchStart = (e) => {
-    startX.current = e.touches[0].clientX;
-    isDragging.current = true;
-  };
-
-  const handleTouchMove = (e) => {
-    if (!startX.current) return;
-    const currentX = e.touches[0].clientX;
-    const diff = currentX - startX.current;
-    setTranslateX(diff);
-    setOpacity(Math.max(0, 1 - Math.abs(diff) / 250));
-  };
-
-  const handleTouchEnd = () => {
-    isDragging.current = false;
-    if (Math.abs(translateX) > 100) {
-      setTranslateX(translateX > 0 ? 500 : -500);
-      setOpacity(0);
-      setTimeout(() => onDismiss(alert), 300);
-    } else {
-      setTranslateX(0);
-      setOpacity(1);
-    }
-    startX.current = null;
-  };
-
-  const handleMouseDown = (e) => {
-    startX.current = e.clientX;
-    isDragging.current = true;
-  };
-  const handleMouseMove = (e) => {
-    if (!isDragging.current) return;
-    const currentX = e.clientX;
-    const diff = currentX - startX.current;
-    setTranslateX(diff);
-    setOpacity(Math.max(0, 1 - Math.abs(diff) / 250));
-  };
-  const handleMouseUp = () => {
-    if (!isDragging.current) return;
-    handleTouchEnd();
-  };
-  const handleMouseLeave = () => {
-    if (isDragging.current) handleTouchEnd();
-  };
-
-  const variant = alert.variant || 'info';
-
-  const styles = {
-    danger: { bg: 'bg-rose-50', iconBg: 'bg-rose-100 text-rose-600', text: 'text-rose-900', border: 'border-rose-100' },
-    warning: { bg: 'bg-amber-50', iconBg: 'bg-amber-100 text-amber-600', text: 'text-amber-900', border: 'border-amber-100' },
-    success: { bg: 'bg-emerald-50', iconBg: 'bg-emerald-100 text-emerald-600', text: 'text-emerald-900', border: 'border-emerald-100' },
-    info: { bg: 'bg-white', iconBg: 'bg-slate-100 text-slate-600', text: 'text-slate-700', border: 'border-slate-100' },
-    social: { bg: 'bg-indigo-50', iconBg: 'bg-indigo-100 text-indigo-600', text: 'text-indigo-900', border: 'border-indigo-100' }
-  };
-
-  const activeStyle = styles[variant] || styles.info;
-
-  let Icon = Info;
-  if (variant === 'danger') Icon = AlertTriangle;
-  if (variant === 'warning') Icon = Bell;
-  if (variant === 'success') Icon = CheckCircle2;
-  if (variant === 'social') Icon = PartyPopper;
-
-  if (alert.type === NOTIFICATION_TYPES.COOKING_DELAYED || alert.type === NOTIFICATION_TYPES.COOKING_PENDING || alert.type === NOTIFICATION_TYPES.COOKING_WINDOW) Icon = Utensils;
-  if (alert.type === NOTIFICATION_TYPES.WATER_DUTY || alert.type === NOTIFICATION_TYPES.LOW_WATER) Icon = Droplets;
-  if (alert.type === NOTIFICATION_TYPES.MARKET) Icon = ShoppingCart;
-  if (alert.type === NOTIFICATION_TYPES.VEG_NEGATIVE || alert.type === NOTIFICATION_TYPES.VEG_LOW) Icon = DollarSign;
-  if (alert.type === NOTIFICATION_TYPES.UPCOMING_DUTY) Icon = Calendar;
-
-  return (
-    <div
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
-      onMouseDown={handleMouseDown}
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
-      onMouseLeave={handleMouseLeave}
-      style={{
-        transform: `translateX(${translateX}px)`,
-        opacity: opacity,
-        transition: isDragging.current ? 'none' : 'transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s ease'
-      }}
-      className={`w-full max-w-md shadow-xl rounded-2xl p-4 flex items-start gap-4 pointer-events-auto touch-pan-y relative select-none cursor-grab active:cursor-grabbing border bg-white ${activeStyle.border}`}
-    >
-      <div className={`mt-0.5 shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${activeStyle.iconBg}`}>
-        <Icon size={20} />
-      </div>
-      <div className="flex-1 pt-0.5">
-        <p className={`text-sm font-semibold leading-tight ${activeStyle.text}`}>{alert.msg}</p>
-      </div>
-      <div className="shrink-0 opacity-20 text-slate-400 self-center"><GripVertical size={20} /></div>
-    </div>
-  );
-};
-
-// --- CUSTOM HOOK: SMART NOTIFICATIONS ---
-
-function useSmartNotifications(context) {
-  const [state, dispatch] = useReducer(notificationReducer, initialNotificationState);
-
-  useEffect(() => {
-    const t = setTimeout(() => dispatch({ type: 'READY' }), 1000);
-    return () => clearTimeout(t);
-  }, []);
-
-  useEffect(() => {
-    if (state.transient) {
-      const t = setTimeout(() => dispatch({ type: 'CLEAR_TRANSIENT' }), 3000);
-      return () => clearTimeout(t);
-    }
-  }, [state.transient]);
-
-  useEffect(() => {
-    if (!state.ready) return;
-    if (!context.currentUser) return; // Guard clause for logged out state
-
-    const now = Date.now();
-    const alerts = [];
-
-    const canShow = (type) =>
-      state.devMode || (!state.dismissed[type] || state.dismissed[type] < now);
-
-    if (context.isWaterLow && canShow(NOTIFICATION_TYPES.LOW_WATER)) {
-      alerts.push({
-        type: NOTIFICATION_TYPES.LOW_WATER,
-        msg: "🚨 URGENT: Water level is LOW! Please arrange a can.",
-        variant: 'danger',
-      });
-    }
-
-    const isHandler = context.currentUser.id === context.vegHandlerId || state.devMode;
-    if (isHandler && context.vegBalance < 0 && canShow(NOTIFICATION_TYPES.VEG_NEGATIVE)) {
-      alerts.push({
-        type: NOTIFICATION_TYPES.VEG_NEGATIVE,
-        msg: `🚨 Veg fund is negative (${formatCurrency(context.vegBalance)}). Immediate collection needed.`,
-        variant: 'danger'
-      });
-    }
-
-    // Water Duty - Only show for members in ACTIVE PAIRS, not available pool
-    const activePairs = context.waterPairs.filter(p => p.status === 'pending' && !p.archived);
-    const isInActivePair = activePairs.some(p => p.members.includes(context.currentUser.id));
-
-    if (isInActivePair && canShow(NOTIFICATION_TYPES.WATER_DUTY)) {
-      alerts.push({
-        type: NOTIFICATION_TYPES.WATER_DUTY,
-        msg: "💧 Your turn for Water Duty today.",
-        variant: 'warning',
-      });
-    }
-
-    const isCook = context.currentUser.role === 'Cook' || state.devMode;
-    const { currentHour, getTaskStatus } = context;
-    if (isCook) {
-      if (currentHour >= TIME_WINDOWS.cookingMorning.start && currentHour < TIME_WINDOWS.cookingMorning.end && getTaskStatus('cook-morning') !== 'done') {
-        const timeElapsed = currentHour - TIME_WINDOWS.cookingMorning.start;
-        if (timeElapsed >= 2 && canShow(NOTIFICATION_TYPES.COOKING_DELAYED)) {
-          alerts.push({ type: NOTIFICATION_TYPES.COOKING_DELAYED, msg: "⚠️ Food preparation delayed > 2 hrs.", variant: 'danger' });
-        } else if (timeElapsed >= 1 && canShow(NOTIFICATION_TYPES.COOKING_PENDING)) {
-          alerts.push({ type: NOTIFICATION_TYPES.COOKING_PENDING, msg: "⏰ Cooking is still pending.", variant: 'warning' });
-        } else if (canShow(NOTIFICATION_TYPES.COOKING_WINDOW)) {
-          alerts.push({ type: NOTIFICATION_TYPES.COOKING_WINDOW, msg: "🍳 Morning cooking window has started.", variant: 'info' });
-        }
-      }
-      else if (currentHour >= TIME_WINDOWS.cookingNight.start && currentHour < TIME_WINDOWS.cookingNight.end && getTaskStatus('cook-night') !== 'done') {
-        const timeElapsed = currentHour - TIME_WINDOWS.cookingNight.start;
-        if (timeElapsed >= 2 && canShow(NOTIFICATION_TYPES.COOKING_DELAYED)) {
-          alerts.push({ type: NOTIFICATION_TYPES.COOKING_DELAYED, msg: "⚠️ Food preparation delayed > 2 hrs.", variant: 'danger' });
-        } else if (timeElapsed >= 1 && canShow(NOTIFICATION_TYPES.COOKING_PENDING)) {
-          alerts.push({ type: NOTIFICATION_TYPES.COOKING_PENDING, msg: "⏰ Cooking is still pending.", variant: 'warning' });
-        } else if (canShow(NOTIFICATION_TYPES.COOKING_WINDOW)) {
-          alerts.push({ type: NOTIFICATION_TYPES.COOKING_WINDOW, msg: "🍳 Night cooking window has started.", variant: 'info' });
-        }
-      }
-    }
-
-    const marketUser = context.dailySchedule.market?.includes(context.currentUser.id) || state.devMode;
-    if (marketUser && getTaskStatus('market') !== 'done' && canShow(NOTIFICATION_TYPES.MARKET)) {
-      const variant = currentHour >= 12 ? 'warning' : 'info';
-      alerts.push({ type: NOTIFICATION_TYPES.MARKET, msg: "🛒 You're assigned to market duty today.", variant });
-    }
-
-    const morningDishUser = context.dailySchedule.morningDish?.includes(context.currentUser.id) || state.devMode;
-    const nightDishUser = context.dailySchedule.nightDish?.includes(context.currentUser.id) || state.devMode;
-    if (canShow(NOTIFICATION_TYPES.DISH)) {
-      if (morningDishUser && getTaskStatus('dish-morning') !== 'done' && currentHour >= 9) {
-        alerts.push({ type: NOTIFICATION_TYPES.DISH, msg: "🍽️ Morning Dishes assigned to you.", variant: 'warning' });
-      } else if (nightDishUser && getTaskStatus('dish-night') !== 'done' && currentHour >= 19) {
-        alerts.push({ type: NOTIFICATION_TYPES.DISH, msg: "🍽️ Night Dishes assigned to you.", variant: 'warning' });
-      }
-    }
-
-    const cleaningUser = context.dailySchedule.cleaning?.includes(context.currentUser.id) || state.devMode;
-    if (cleaningUser && getTaskStatus('cleaning') !== 'done' && canShow(NOTIFICATION_TYPES.CLEANING)) {
-      alerts.push({ type: NOTIFICATION_TYPES.CLEANING, msg: "🧹 You're on cleaning duty today.", variant: 'warning' });
-    }
-
-    if (canShow(NOTIFICATION_TYPES.UPCOMING_DUTY) && currentHour >= 20) {
-      const tomorrow = new Date(context.simulatedDate);
-      tomorrow.setDate(tomorrow.getDate() + 1);
-    }
-
-    if (isHandler && context.vegBalance >= 0 && context.vegBalance < 200 && canShow(NOTIFICATION_TYPES.VEG_LOW)) {
-      alerts.push({
-        type: NOTIFICATION_TYPES.VEG_LOW,
-        msg: `🥗 Veg Fund is running low — ${formatCurrency(context.vegBalance)} left.`,
-        variant: 'warning'
-      });
-    }
-
-    if (context.hasCompletedAllTasks && canShow(NOTIFICATION_TYPES.GROUP_SOCIAL)) {
-      alerts.push({
-        type: NOTIFICATION_TYPES.GROUP_SOCIAL,
-        msg: "🙌 All duties completed today. Great job everyone! 🎉",
-        variant: 'social'
-      });
-    }
-
-    alerts.sort((a, b) =>
-      NOTIFICATION_PRIORITY.indexOf(a.type) - NOTIFICATION_PRIORITY.indexOf(b.type)
-    );
-
-    const finalAlerts = state.devMode ? alerts : alerts.slice(0, 2);
-    dispatch({ type: 'SET_PERSISTENT', payload: finalAlerts });
-
-  }, [
-    context, state.ready, state.dismissed, state.devMode
-  ]);
-
-  return { state, dispatch };
-}
 
 // --- MAIN APP ---
 
@@ -495,13 +186,13 @@ export default function App() {
   const [waterSelection, setWaterSelection] = useState([]);
 
   const [isWaterLow, setIsWaterLow] = useState(false);
-  const [showSummary, setShowSummary] = useState(false);
   const [showChangeLog, setShowChangeLog] = useState(false);
   const [changeLog, setChangeLog] = useState([]);
   const [roomMetadata, setRoomMetadata] = useState(null);
-  const [houseNote, setHouseNote] = useState(null);
+
   const [exemptMembers, setExemptMembers] = useState([]);
   const [isFrozen, setIsFrozen] = useState(false);
+  const [cookTracker, setCookTracker] = useState({ cookedMeals: 0, missedMeals: 0, startDate: new Date().toISOString() });
 
   // --- FIRESTORE LISTENERS ---
   useEffect(() => {
@@ -528,9 +219,10 @@ export default function App() {
         if (data.vegExemptions) setVegExemptions(data.vegExemptions);
         if (data.exemptMembers) setExemptMembers(data.exemptMembers);
         if (data.isFrozen !== undefined) setIsFrozen(data.isFrozen);
+        if (data.cookTracker) setCookTracker(data.cookTracker);
 
         if (data.changeLog) setChangeLog(data.changeLog);
-        if (data.houseNote) setHouseNote(data.houseNote);
+
         if (data.updatedAt) setRoomMetadata({
           updatedAt: data.updatedAt,
           updatedBy: data.updatedBy
@@ -619,11 +311,6 @@ export default function App() {
   const [recentlyUpdatedFields, setRecentlyUpdatedFields] = useState([]);
   const prevRoomData = useRef({});
   const prevDayStr = useRef("");
-  const [theme, setTheme] = useState(() => localStorage.getItem("flowhouse_theme") || "light");
-
-  useEffect(() => {
-    localStorage.setItem("flowhouse_theme", theme);
-  }, [theme]);
 
   const updateRoom = async (updates, logText = null) => {
     if (!currentUser) return;
@@ -685,57 +372,12 @@ export default function App() {
   }, [tasks, simulatedDate]);
 
   const hasCompletedAllTasks = useMemo(() => {
-    const todayTasks = [];
-    if (dailySchedule.morningDish) todayTasks.push('dish-morning');
-    if (dailySchedule.nightDish) todayTasks.push('dish-night');
-    if (dailySchedule.cleaning) todayTasks.push('cleaning');
-    if (dailySchedule.market && dailySchedule.market.length > 0) todayTasks.push('market');
-    todayTasks.push('cook-morning');
-    todayTasks.push('cook-night');
+    return false; // Simplified
+  }, []);
 
-    if (todayTasks.length === 0) return false;
-    return todayTasks.every(t => getTaskStatus(t) === 'done');
-  }, [dailySchedule, getTaskStatus]);
-
-
-  const notificationContext = useMemo(() => ({
-    isWaterLow,
-    waterPairs,
-    schedule,
-    dailySchedule,
-    tasks,
-    currentUser,
-    vegBalance,
-    simulatedDate,
-    vegHandlerId,
-    currentHour,
-    getTaskStatus,
-    hasCompletedAllTasks
-  }), [isWaterLow, waterPairs, schedule, dailySchedule, tasks, currentUser, vegBalance, simulatedDate, vegHandlerId, currentHour, hasCompletedAllTasks, getTaskStatus]);
-
-  const { state: notificationState, dispatch: notifyDispatch } = useSmartNotifications(notificationContext);
 
   const triggerAlert = (msg, type = 'danger') => {
-    notifyDispatch({ type: 'SHOW_TRANSIENT', payload: { msg, variant: type } });
-  };
-
-  const triggerDemoNotifications = () => {
-    triggerAlert("✅ Logged in successfully", 'success');
-    setTimeout(() => triggerAlert("⚠️ Cooking is still pending", 'warning'), 1000);
-    setTimeout(() => triggerAlert("🚨 Water empty. Call supplier immediately.", 'danger'), 2000);
-    setTimeout(() => triggerAlert("🙌 All duties completed today 🎉", 'social'), 3000);
-  };
-
-  const dismissAlert = (alert) => {
-    let ttl = 60 * 60 * 1000;
-    if (alert.type === NOTIFICATION_TYPES.LOW_WATER || alert.type === NOTIFICATION_TYPES.VEG_NEGATIVE) ttl = 15 * 60 * 1000;
-    if (alert.type === NOTIFICATION_TYPES.WATER_DUTY) ttl = 30 * 60 * 1000;
-    if (alert.type === NOTIFICATION_TYPES.COOKING_WINDOW) ttl = 4 * 60 * 60 * 1000;
-
-    notifyDispatch({
-      type: 'DISMISS',
-      payload: { type: alert.type, ttl }
-    });
+    console.log(`Alert [${type}]: ${msg}`);
   };
 
   const initiateUserSwitch = (targetUser) => {
@@ -748,7 +390,6 @@ export default function App() {
 
   const logout = () => {
     setCurrentUser(null);
-    notifyDispatch({ type: 'RESET' });
   };
 
   const initiateHandlerToggle = (memberId) => {
@@ -832,19 +473,6 @@ export default function App() {
     return pool.filter(id => !pairedMembers.has(id) && !exemptMembers.includes(id)).sort();
   }, [schedule, includeCook, waterPairs, exemptMembers, members]);
 
-  useEffect(() => {
-    if (waterPool.length === 2 && waterSelection.length === 0) {
-      // Auto-create pair if only 2 people left.
-      // Leader check: Only the first alphabetic ID creates it to avoid race conditions.
-      // And we must be logged in.
-      if (!currentUser) return;
-      const sortedMembers = [...waterPool].sort();
-      if (currentUser.id === sortedMembers[0]) {
-        const newPair = { members: sortedMembers, status: 'pending', timestamp: new Date().toISOString() };
-        addDoc(collection(db, 'rooms', ROOM_ID, 'waterPairs'), newPair);
-      }
-    }
-  }, [waterPool, waterSelection, currentUser]);
 
   const toggleWaterSelection = (id) => {
     if (isGuest) return;
@@ -875,12 +503,25 @@ export default function App() {
     if (isGuest) return;
     if (isReadOnly) { triggerAlert("🧊 App is temporarily frozen", "info"); return; }
     if (waterSelection.length !== 2) return;
-    const newPair = { members: [...waterSelection], status: 'pending', timestamp: new Date().toISOString() };
+
+    const memberNames = waterSelection.map(mid => members.find(m => m.id === mid)?.name).join(' & ');
+    const confirmed = window.confirm(`Assign Water Duty for ${memberNames}?`);
+    if (!confirmed) return;
+
+    const newPair = {
+      members: [...waterSelection],
+      status: 'pending',
+      timestamp: new Date().toISOString()
+    };
+
     addDoc(collection(db, 'rooms', ROOM_ID, 'waterPairs'), newPair);
     setWaterSelection([]);
     updateRoom({ exemptMembers: [] }); // Auto-clear exemptions on assignment
-    haptic.success();
-    triggerAlert("Water Pair Created", "success");
+
+    updateRoom({}, `${currentUser.name} assigned Water Duty to ${memberNames}`);
+
+    haptic.medium();
+    triggerAlert("Water Pair Assigned", "info");
   };
 
 
@@ -894,7 +535,7 @@ export default function App() {
     if (!pair) return;
 
     const path = `rooms/${ROOM_ID}/waterPairs/${String(pairId)}`;
-    updateDoc(doc(db, path), { status: 'done', completedAt: new Date().toISOString() });
+    updateDoc(doc(db, path), { status: 'done', completedAt: new Date().toISOString(), completedBy: currentUser.name });
 
     // Log the action to the room
     const memberNames = pair.members.map(mid => members.find(m => m.id === mid)?.name).join(' & ');
@@ -965,6 +606,52 @@ export default function App() {
     }
   };
 
+  const markCookTask = (taskId, newStatus, specificDateStr = null) => {
+    if (isGuest) { triggerAlert("🔒 Guest mode — read only", "info"); return; }
+    if (isReadOnly) { triggerAlert("🧊 App is temporarily frozen", "info"); return; }
+    if (!tasks) return;
+
+    haptic.light();
+    const key = specificDateStr ? `${specificDateStr}-${taskId}` : `${simulatedDate.toDateString()}-${taskId}`;
+    const currentStatus = tasks[key]?.status;
+
+    // Nothing changed
+    if (currentStatus === newStatus) return;
+
+    // Update task
+    setDoc(doc(db, 'rooms', ROOM_ID, 'tasks', key), {
+      status: newStatus,
+      updatedAt: new Date().toISOString(),
+      updatedBy: currentUser.id
+    }, { merge: true });
+
+    const niceTaskName = taskId.replace('-', ' ').toUpperCase();
+    const actionStr = newStatus === 'cooked' ? 'Cooked' : newStatus === 'missed' ? 'Missed' : 'Undid';
+    const msg = specificDateStr ? `${actionStr} Past ${niceTaskName} (${specificDateStr})` : `${actionStr} ${niceTaskName}`;
+
+    updateRoom({}, msg);
+    triggerAlert(`Cook Duty: ${actionStr}`, newStatus === 'missed' ? "danger" : "success");
+  };
+
+  const resetCookTracker = () => {
+    if (isGuest) return;
+    if (isReadOnly) { triggerAlert("🧊 App is temporarily frozen", "info"); return; }
+    if (currentUser.id !== vegHandlerId) { triggerAlert("Restricted. Veg Handler only.", "danger"); return; }
+
+    const confirmed = window.confirm("Reset the cook tracker statistics back to 0?");
+    if (!confirmed) return;
+
+    const newTracker = {
+      cookedMeals: 0,
+      missedMeals: 0,
+      startDate: new Date().toISOString()
+    };
+
+    updateRoom({ cookTracker: newTracker }, "Reset Cook Tracker stats");
+    haptic.medium();
+    triggerAlert("Cook Tracker Reset", "success");
+  };
+
   const addGeneralExpense = (amount, notes) => {
     if (isGuest) { triggerAlert("🔒 Guest mode — read only", "info"); return; }
     if (isReadOnly) { triggerAlert("🧊 App is temporarily frozen", "info"); return; }
@@ -978,18 +665,7 @@ export default function App() {
     triggerAlert("Veg Expense Added", "success");
   };
 
-  const updateHouseNote = (text) => {
-    if (isGuest) { triggerAlert("🔒 Guest mode — read only", "info"); return; }
-    if (isReadOnly) { triggerAlert("🧊 App is temporarily frozen", "info"); return; }
-    updateRoom({
-      houseNote: {
-        text,
-        updatedBy: currentUser.name,
-        updatedAt: new Date().toISOString() // Using ISO string for client consistency, serverTimestamp is also fine but ISO works with simple logic
-      }
-    }, `${currentUser.name} updated the house note`);
-    haptic.success();
-  };
+
 
   const toggleFreeze = () => {
     const isAdmin = currentUser.id === vegHandlerId;
@@ -1059,20 +735,21 @@ export default function App() {
     triggerAlert("Member status updated", "info");
   };
 
-  const addVegExpense = (amount, desc) => {
+  const addVegExpense = (amount, desc, category) => {
     if (isGuest) { triggerAlert("🔒 Guest mode — read only", "info"); return; }
     if (isReadOnly) { triggerAlert("🧊 App is temporarily frozen", "info"); return; }
     if (currentUser.id !== vegHandlerId) { triggerAlert("Restricted. Veg Handler only.", "danger"); return; }
     addDoc(collection(db, 'rooms', ROOM_ID, 'vegExpenses'), {
       amount: parseFloat(amount),
       desc,
+      category: category,
       date: new Date().toISOString(),
       paidBy: currentUser.id
     });
 
-    updateRoom({}, `Spent Veg Fund: ${formatCurrency(amount)} (${desc})`);
+    updateRoom({}, `Spent ${category} Fund: ${formatCurrency(amount)} (${desc})`);
 
-    triggerAlert("Veg Fund Expense Added", "success");
+    triggerAlert(`Veg Fund Expense Added (${category})`, "success");
   };
 
   const deleteTransaction = (collectionName, id) => {
@@ -1102,74 +779,11 @@ export default function App() {
     triggerAlert("Month reset complete", "success");
   };
 
-  const NotificationBanner = () => {
-    if (!notificationState.ready) return null;
-    const { persistent, transient } = notificationState;
-    return (
-      <div className="fixed top-0 left-0 right-0 z-50 px-4 pt-4 flex flex-col items-center gap-2 pointer-events-none">
-        {transient && (
-          <SwipeableNotification
-            key={`transient-${Date.now()}`}
-            alert={{ ...transient, type: NOTIFICATION_TYPES.TRANSIENT }}
-            onDismiss={() => notifyDispatch({ type: 'CLEAR_TRANSIENT' })}
-          />
-        )}
-        {persistent.map(alert => (
-          <SwipeableNotification
-            key={alert.type}
-            alert={alert}
-            onDismiss={() => dismissAlert(alert)}
-          />
-        ))}
-      </div>
-    );
-  };
 
 
 
-  const ScheduleEditor = () => {
-    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday1', 'Sunday2', 'Sunday3'];
-    const [selectedDay, setSelectedDay] = useState('Monday');
-    const [editingRole, setEditingRole] = useState(null);
 
-    const EditModal = () => {
-      if (!editingRole) return null;
-      const currentAssigned = schedule[selectedDay][editingRole.role] || [];
-      const toggleMember = (mid) => {
-        haptic.light();
-        updateSchedule(selectedDay, editingRole.role, currentAssigned.includes(mid) ? currentAssigned.filter(id => id !== mid) : [...currentAssigned, mid]);
-      };
-      return (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl w-full max-w-sm p-6">
-            <div className="flex justify-between items-center mb-4"><h3 className="text-lg font-bold">{editingRole.label}</h3><button onClick={() => setEditingRole(null)}><X size={20} /></button></div>
-            <div className="space-y-2 max-h-60 overflow-y-auto">{members.map(m => (<button key={m.id} onClick={() => toggleMember(m.id)} className={`w-full flex items-center justify-between p-3 rounded-xl border ${currentAssigned.includes(m.id) ? 'bg-indigo-50 border-indigo-500' : 'bg-white border-slate-200'}`}><div className="flex items-center gap-3"><MemberAvatar name={m.name} code={m.avatar} /><span className="font-medium">{m.name}</span></div>{currentAssigned.includes(m.id) && <CheckCircle2 size={18} className="text-indigo-600" />}</button>))}</div>
-            <button onClick={() => setEditingRole(null)} className="w-full bg-slate-900 text-white py-3 rounded-xl font-bold mt-4">Done</button>
-          </div>
-        </div>
-      );
-    };
 
-    return (
-      <div className="pb-8">
-        <header className="bg-white p-4 sticky top-0 z-10 shadow-sm border-b border-slate-100 flex flex-col gap-4">
-          <h1 className="text-xl font-bold text-slate-800">Schedule Builder</h1>
-          <div className="flex overflow-x-auto gap-2 pb-2 no-scrollbar">{days.map(day => (<button key={day} onClick={() => setSelectedDay(day)} className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap ${selectedDay === day ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600'}`}>{day}</button>))}</div>
-        </header>
-        <div className="p-4 space-y-4">
-          <Card className="p-4 bg-slate-50 border-slate-200 flex justify-between items-center"><div className="flex gap-2 font-bold text-slate-700"><Droplets size={18} className="text-blue-500" /> Water Config</div><button disabled={isGuest} onClick={() => setIncludeCook(!includeCook)} className={`px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-2 ${includeCook ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-200 text-slate-500'}`}>{includeCook ? <ToggleRight size={20} /> : <ToggleLeft size={20} />}{includeCook ? 'Cook Included' : 'Cook Excluded'}</button></Card>
-          {[{ id: 'morningDish', label: 'Morning Dishes' }, { id: 'nightDish', label: 'Night Dishes' }, { id: 'cleaning', label: 'Cleaning' }, { id: 'market', label: 'Market' }].map(role => (
-            <Card key={role.id} className="p-4 relative">
-              {!isGuest && <button onClick={() => setEditingRole({ role: role.id, label: role.label })} className="absolute top-4 right-4 p-2 bg-slate-100 rounded-full text-slate-600"><Edit2 size={16} /></button>}
-              <span className="uppercase text-xs font-bold text-slate-400 tracking-wider block mb-3">{role.label}</span>
-              <div className="flex flex-wrap gap-2 pr-8 min-h-[40px]">{schedule[selectedDay][role.id]?.length > 0 ? schedule[selectedDay][role.id]?.map(id => <div key={id} className="flex items-center gap-2 bg-slate-50 border pr-3 rounded-full"><MemberAvatar name={members.find(m => m.id === id)?.name} code={members.find(m => m.id === id)?.avatar} /><span className="text-sm font-medium">{members.find(m => m.id === id)?.name}</span></div>) : <span className="text-sm text-slate-400 italic">No one assigned</span>}</div>
-            </Card>
-          ))}
-        </div>
-        <EditModal />
-      </div>
-    );
-  };
 
 
 
@@ -1197,6 +811,11 @@ export default function App() {
 
   // --- VIEW RENDERING ---
 
+  // ── Widget Route — standalone, no auth required ──────────────────────────
+  if (window.location.pathname === '/widget') {
+    return <WaterWidget />;
+  }
+
   if (!currentUser) {
     return (
       <MemberLogin
@@ -1210,10 +829,10 @@ export default function App() {
   }
 
   return (
-    <div className={`max-w-md mx-auto bg-card h-[100dvh] relative shadow-2xl overflow-hidden font-sans text-theme transition-colors duration-300 ${theme}`}>
+    <div className={`max-w-md mx-auto bg-[#fafafa] h-[100dvh] relative shadow-[0_0_40px_rgba(0,0,0,0.03)] overflow-hidden font-sans text-slate-900 transition-colors duration-300 pt-[env(safe-area-inset-top)]`}>
       {/* Phase T7: Global Freeze Banner */}
       {isFrozen && (
-        <div className="bg-slate-800 text-white text-xs text-center py-1.5 px-2 font-medium z-50 relative">
+        <div className="bg-slate-800 text-white text-xs text-center py-1.5 px-2 font-medium z-50 relative tracking-wide">
           {isAdmin ? "🧊 App frozen · you can unfreeze in Settings" : "🧊 App is temporarily frozen"}
         </div>
       )}
@@ -1228,9 +847,6 @@ export default function App() {
             currentUser={currentUser}
             members={members}
             vegHandlerId={vegHandlerId}
-            notificationState={notificationState}
-            notifyDispatch={notifyDispatch}
-            dismissAlert={dismissAlert}
             simulatedDate={simulatedDate}
             currentHour={currentHour}
             dailySchedule={dailySchedule}
@@ -1250,29 +866,30 @@ export default function App() {
             toggleTask={toggleTask}
             isGuest={isGuest}
             triggerAlert={triggerAlert}
-            NotificationBanner={NotificationBanner}
             isOnline={isOnline}
             isSyncing={isSyncing}
             hasPendingWrites={hasPendingWrites}
             offlineQueueCount={offlineQueueCount}
-            setShowSummary={setShowSummary}
             recentlyUpdatedFields={recentlyUpdatedFields}
-            houseNote={houseNote}
-            updateHouseNote={updateHouseNote}
             exemptMembers={exemptMembers}
             toggleExemption={toggleExemption}
-            theme={theme}
+            cookTracker={cookTracker}
+            markCookTask={markCookTask}
+            resetCookTracker={resetCookTracker}
+            tasks={tasks}
           />
         </div>
         <div className="min-w-full h-full snap-start snap-always overflow-y-auto no-scrollbar">
-          <ScheduleEditor
+          <ScheduleView
             schedule={schedule}
             members={members}
             updateSchedule={updateSchedule}
-            isGuest={currentUser.id === 'guest'}
+            isGuest={isGuest}
+            includeCook={includeCook}
+            setIncludeCook={setIncludeCook}
           />
         </div>
-        <div className="min-w-full h-full snap-start snap-always overflow-y-auto no-scrollbar">
+        <div className="min-w-full h-full snap-start snap-always overflow-y-auto no-scrollbar bg-[#fcfcfc]">
           <ExpensesView
             expenses={expenses}
             vegExpenses={vegExpenses}
@@ -1294,11 +911,9 @@ export default function App() {
             resetMonth={resetMonth}
             triggerAlert={triggerAlert}
             isGuest={isGuest}
-            theme={theme}
-            setTheme={setTheme}
           />
         </div>
-        <div className="min-w-full h-full snap-start snap-always overflow-y-auto no-scrollbar">
+        <div className="min-w-full h-full snap-start snap-always overflow-y-auto no-scrollbar bg-[#ffffff]">
           <SettingsScreen
             currentUser={currentUser}
             members={members}
@@ -1307,8 +922,6 @@ export default function App() {
             exemptMembers={exemptMembers}
             isFrozen={isFrozen}
             toggleFreeze={toggleFreeze}
-            theme={theme}
-            setTheme={setTheme}
             logout={logout}
             initiateUserSwitch={initiateUserSwitch}
             initiateHandlerToggle={initiateHandlerToggle}
@@ -1316,70 +929,60 @@ export default function App() {
             setSimulatedDate={setSimulatedDate}
             setSundayVariant={setSundayVariant}
             sundayVariant={sundayVariant}
-            notifyDispatch={notifyDispatch}
-            notificationState={notificationState}
-            triggerDemoNotifications={triggerDemoNotifications}
             setMembers={setMembers}
             triggerAlert={triggerAlert}
             setCurrentUser={setCurrentUser}
-            setShowSummary={setShowSummary}
           />
         </div>
       </div>
 
-      {/* Monthly Summary Overlay */}
-      {showSummary && (
-        <MonthlySummary
-          members={members}
-          waterPairs={waterPairs}
-          expenses={expenses}
-          onClose={() => setShowSummary(false)}
-        />
-      )}
 
       {/* Change Log Overlay */}
       {showChangeLog && (
         <ChangeLog
-          changeLog={changeLog}
+          recentChanges={changeLog.slice(0, 5)}
+          cookTracker={cookTracker}
+          markCookTask={markCookTask}
+          resetCookTracker={resetCookTracker}
           onClose={() => setShowChangeLog(false)}
         />
       )}
 
       {/* Remote Update Toast */}
       {lastRemoteUpdate && (
-        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-xs px-3 py-1.5 rounded-full shadow-lg animate-fade-in z-50 pointer-events-none flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-          Updated by {lastRemoteUpdate.by}
+        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 bg-indigo-600 text-white text-xs uppercase font-bold tracking-widest px-4 py-2 rounded-full shadow-lg pointer-events-none flex items-center gap-2 z-50">
+          <span className="w-2 h-2 rounded-full bg-white animate-pulse"></span>
+          UPDATED BY {lastRemoteUpdate.by}
         </div>
       )}
 
-      <nav className="fixed bottom-0 max-w-md w-full bg-white border-t border-slate-200 px-6 py-3 flex justify-between items-center z-20">
-        <NavButton active={activeTab === 'dashboard'} onClick={() => scrollToTab('dashboard')} icon={<Menu size={20} />} label="Today" />
-        <NavButton active={activeTab === 'schedule'} onClick={() => scrollToTab('schedule')} icon={<Calendar size={20} />} label="Schedule" />
-        <NavButton active={activeTab === 'expenses'} onClick={() => scrollToTab('expenses')} icon={<DollarSign size={20} />} label="Expenses" />
-        <NavButton active={activeTab === 'settings'} onClick={() => scrollToTab('settings')} icon={<Users size={20} />} label="Profile" />
+      <nav className="fixed bottom-0 max-w-md w-full bg-white/95 backdrop-blur-xl border-t border-slate-100 rounded-t-[32px] px-6 py-4 flex justify-between items-center z-20 shadow-[0_-10px_40px_rgba(0,0,0,0.03)] pb-[calc(1rem+env(safe-area-inset-bottom))]">
+        <NavButton active={activeTab === 'dashboard'} onClick={() => scrollToTab('dashboard')} icon={<Menu size={22} />} label="Today" />
+        <NavButton active={activeTab === 'schedule'} onClick={() => scrollToTab('schedule')} icon={<Calendar size={22} />} label="Schedule" />
+        <NavButton active={activeTab === 'expenses'} onClick={() => scrollToTab('expenses')} icon={<DollarSign size={22} />} label="Expenses" />
+        <NavButton active={activeTab === 'settings'} onClick={() => scrollToTab('settings')} icon={<Users size={22} />} label="Profile" />
       </nav>
       {/* Global PIN Modal - Rendered outside of tabs */}
       {showPinModal && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-xs rounded-2xl p-6 text-center shadow-2xl">
-            <h3 className="font-bold text-lg mb-2">Enter PIN</h3>
-            <p className="text-xs text-slate-500 mb-4">{pinMode === 'handler' ? 'Veg Handler Access' : `Login as ${members.find(m => m.id === pendingTargetId)?.name}`}</p>
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-center justify-center p-4">
+          <div className="glass-panel w-full max-w-xs rounded-[28px] p-8 text-center shadow-premium">
+            <h3 className="font-bold text-theme text-xl mb-2">Auth Required</h3>
+            <p className="text-sm text-muted mb-6">{pinMode === 'handler' ? 'Veg handler access' : `Login as ${members.find(m => m.id === pendingTargetId)?.name}`}</p>
             <form onSubmit={confirmPin}>
               <input
                 type="password"
                 value={pinInput}
                 onChange={e => { setPinInput(e.target.value); setPinError(""); }}
-                className={`w-full text-center text-2xl tracking-widest p-2 border rounded-xl mb-4 focus:outline-none focus:ring-2 ${pinError ? 'border-rose-500 focus:ring-rose-200' : 'focus:ring-emerald-200'}`}
+                className={`w-full text-center text-3xl font-mono text-theme p-3 border-2 rounded-xl mb-6 focus:outline-none focus:ring-4 transition-all bg-card ${pinError ? 'border-rose-300 focus:border-rose-500 focus:ring-rose-100 bg-rose-50' : 'border-theme focus:border-indigo-500 focus:ring-indigo-100'}`}
                 autoFocus
-                placeholder="••••"
+                placeholder="----"
                 maxLength={4}
                 autoComplete="one-time-code"
               />
               {pinError && <p className="text-rose-500 text-sm font-bold mb-4 animate-pulse">{pinError}</p>}
-              <button type="submit" className="w-full bg-emerald-600 text-white py-2 rounded-xl font-bold hover:bg-emerald-700 transition-colors">Confirm</button>
+              <button type="submit" className="w-full bg-indigo-600 text-white py-3 rounded-[16px] font-bold hover:bg-indigo-700 transition-colors shadow-lg active:scale-95">Confirm Access</button>
             </form>
-            <button onClick={() => { setShowPinModal(false); setPinInput(""); setPinError(""); }} className="mt-4 text-xs text-slate-400 hover:text-slate-600">Cancel</button>
+            <button onClick={() => { setShowPinModal(false); setPinInput(""); setPinError(""); }} className="mt-4 text-xs font-bold text-muted hover:text-theme tracking-wider uppercase transition-colors">Cancel</button>
           </div>
         </div>
       )}

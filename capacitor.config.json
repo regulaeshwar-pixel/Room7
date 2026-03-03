@@ -1,0 +1,6 @@
+{
+    "appId": "com.flowhouse.app",
+    "appName": "FlowHouse",
+    "webDir": "build",
+    "bundledWebRuntime": false
+}

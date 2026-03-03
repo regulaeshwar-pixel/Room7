@@ -35,7 +35,6 @@ const ExpensesView = ({
     addVegExpense,
     deleteTransaction,
     resetMonth,
-    triggerAlert,
     isGuest
 }) => {
     const [showGenModal, setShowGenModal] = useState(false);
@@ -54,11 +53,16 @@ const ExpensesView = ({
     const isHandler = currentUser.id === vegHandlerId;
     const canReset = currentUser.role === 'Cook' || currentUser.id === vegHandlerId;
 
-    const totalVegGiven = vegCollections.reduce((sum, c) => sum + c.amount, 0);
-    const totalVegExpenses = vegExpenses.reduce((sum, e) => sum + e.amount, 0);
-    const vegBalance = totalVegGiven - totalVegExpenses;
+    const groceriesGiven = vegCollections.filter(c => c.category === CATEGORY_GROCERIES).reduce((sum, c) => sum + c.amount, 0);
+    const groceriesExpenses = vegExpenses.filter(e => e.category === CATEGORY_GROCERIES).reduce((sum, e) => sum + e.amount, 0);
+    const groceriesBalance = groceriesGiven - groceriesExpenses;
+
+    const vegOnlyGiven = vegCollections.filter(c => c.category === CATEGORY_VEGETABLES).reduce((sum, c) => sum + c.amount, 0);
+    const vegOnlyExpenses = vegExpenses.filter(e => e.category === CATEGORY_VEGETABLES).reduce((sum, e) => sum + e.amount, 0);
+    const vegOnlyBalance = vegOnlyGiven - vegOnlyExpenses;
+
     const totalGeneralExpenses = expenses.reduce((sum, e) => sum + e.amount, 0);
-    const totalMonthlyExpenses = totalGeneralExpenses + totalVegExpenses;
+    const totalMonthlyExpenses = totalGeneralExpenses + groceriesExpenses + vegOnlyExpenses;
 
     const handleGenSubmit = (e) => {
         e.preventDefault();
@@ -84,7 +88,7 @@ const ExpensesView = ({
     const handleVegExpSubmit = (e) => {
         e.preventDefault();
         haptic.success();
-        addVegExpense(vegAmount, vegNote);
+        addVegExpense(vegAmount, vegNote, vegCategory);
         setShowVegExpModal(false);
         setVegAmount('');
         setVegNote('');
@@ -94,7 +98,6 @@ const ExpensesView = ({
         e.preventDefault();
         setExpectedAmounts(prev => ({ ...prev, [editingCategory]: parseFloat(newExpectedAmount) }));
         setShowEditAmountModal(false);
-        triggerAlert(`Default amount for ${editingCategory} updated`, "success");
     };
 
     const getMemberStatus = React.useCallback((memberId, category) => {
@@ -134,40 +137,44 @@ const ExpensesView = ({
                 totalReceived += paid;
                 totalPending += remaining;
             }
+            if (expectedPerPerson === 0 && paid === 0) return null;
+
             return (
-                <div key={m.id} className="flex items-center justify-between py-2 text-sm">
-                    <div className="flex items-center gap-3">
-                        <MemberAvatar name={m.name} code={m.avatar} size="sm" />
-                        <span className="font-medium text-slate-700">{m.name}</span>
+                <div key={m.id} className="flex items-center justify-between py-2 text-sm border-b border-slate-50 last:border-0 group/member transition-all duration-300">
+                    <div className="flex items-center gap-4">
+                        <MemberAvatar name={m.name} code={m.avatar} size="sm" className="w-8 h-8 ring-2 ring-white shadow-sm transition-transform group-hover/member:scale-110" />
+                        <span className="font-black text-slate-800 tracking-tight">{m.name}</span>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-4">
                         {status === 'cancelled' && (
-                            <div className="flex items-center gap-1 text-orange-500 bg-orange-50 px-2 py-0.5 rounded text-xs font-bold">
+                            <div className="flex items-center gap-1.5 text-orange-400 bg-orange-50/50 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider">
                                 <span>Cancelled</span>
-                                <Ban size={14} />
+                                <Ban size={12} strokeWidth={2.5} />
                             </div>
                         )}
                         {status === 'full' && (
-                            <div className="flex items-center gap-2 text-emerald-600 font-bold">
+                            <div className="flex items-center gap-2.5 text-emerald-600 font-black text-[13px] tracking-tight">
                                 <span>{formatCurrency(paid)}</span>
-                                <CheckCircle2 size={16} />
+                                <div className="p-1 bg-emerald-50 rounded-lg"><CheckCircle2 size={14} strokeWidth={3} /></div>
                             </div>
                         )}
                         {status === 'partial' && (
-                            <div className="flex items-center gap-2 text-amber-600 font-bold">
-                                <span>{formatCurrency(paid)}</span>
-                                <span className="text-[10px] bg-amber-50 px-1 rounded text-amber-500 font-normal">rem {formatCurrency(remaining)}</span>
-                                <AlertTriangle size={16} />
+                            <div className="flex items-center gap-2 text-amber-600 font-black text-[13px] tracking-tight">
+                                <div className="flex flex-col items-end">
+                                    <span>{formatCurrency(paid)}</span>
+                                    <span className="text-[10px] text-amber-500/70 font-black uppercase tracking-widest mt-0.5">rem {formatCurrency(remaining)}</span>
+                                </div>
+                                <div className="p-1 bg-amber-50 rounded-lg"><AlertTriangle size={14} strokeWidth={3} /></div>
                             </div>
                         )}
                         {status === 'pending' && (
-                            <div className="flex items-center gap-2 text-slate-400">
-                                <span className="text-xs">{formatCurrency(expectedPerPerson)}</span>
-                                <Clock size={16} />
+                            <div className="flex items-center gap-2.5 text-slate-300 font-black text-[12px] tracking-tight">
+                                <span>{formatCurrency(expectedPerPerson)}</span>
+                                <div className="p-1 bg-slate-50 rounded-lg"><Clock size={14} strokeWidth={3} /></div>
                             </div>
                         )}
                         {isHandler && (
-                            <button onClick={() => handleEditClick(m.id, category)} className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded">
+                            <button onClick={() => handleEditClick(m.id, category)} className="p-2 text-slate-300 hover:text-indigo-600 hover:bg-slate-50 rounded-xl transition-all active:scale-90">
                                 <Edit2 size={14} />
                             </button>
                         )}
@@ -178,27 +185,24 @@ const ExpensesView = ({
 
         return (
             <div className="mb-6">
-                <div className="flex items-center gap-2 mb-3">
-                    <div className="h-px bg-slate-200 flex-1"></div>
-                    <div className="flex items-center gap-1">
-                        <h4 className="text-xs font-bold uppercase text-slate-400 tracking-wider">{title}</h4>
-                        {isHandler && (
-                            <button onClick={() => { setEditingCategory(category); setNewExpectedAmount(expectedAmounts[category]); setShowEditAmountModal(true); }} className="text-slate-400 hover:text-indigo-600 p-1 rounded hover:bg-indigo-50">
-                                <Edit2 size={10} />
-                            </button>
-                        )}
-                    </div>
-                    <div className="h-px bg-slate-200 flex-1"></div>
+                <div className="flex items-center gap-4 mb-5">
+                    <span className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 whitespace-nowrap">{title} Tasks</span>
+                    <div className="h-[1px] bg-slate-100 flex-1"></div>
+                    {isHandler && (
+                        <button onClick={() => { setEditingCategory(category); setNewExpectedAmount(expectedAmounts[category]); setShowEditAmountModal(true); }} className="p-2 bg-slate-50/50 text-slate-300 hover:text-indigo-600 rounded-xl transition-all">
+                            <Edit2 size={12} />
+                        </button>
+                    )}
                 </div>
-                <div className="divide-y divide-slate-100 mb-3">{listItems}</div>
-                <div className="bg-white/50 rounded-lg p-2 flex justify-between text-xs border border-emerald-100/50">
-                    <div className="text-emerald-700">
-                        <span className="block opacity-70 uppercase text-[10px]">Received</span>
-                        <span className="font-bold text-sm">{formatCurrency(totalReceived)}</span>
+                <div className="space-y-1 mb-4">{listItems.filter(Boolean)}</div>
+                <div className="bg-slate-50/50 backdrop-blur-sm rounded-[24px] p-5 flex justify-between items-center border border-slate-100/50">
+                    <div>
+                        <span className="block text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mb-1">Total Received</span>
+                        <span className="font-black text-xl text-emerald-600 tracking-tight">{formatCurrency(totalReceived)}</span>
                     </div>
-                    <div className="text-slate-500 text-right">
-                        <span className="block opacity-70 uppercase text-[10px]">Pending</span>
-                        <span className="font-bold text-sm text-amber-600">{formatCurrency(totalPending)}</span>
+                    <div className="text-right">
+                        <span className="block text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mb-1">Still Pending</span>
+                        <span className="font-black text-xl text-amber-600 tracking-tight">{formatCurrency(totalPending)}</span>
                     </div>
                 </div>
             </div>
@@ -206,101 +210,191 @@ const ExpensesView = ({
     };
 
     return (
-        <div className="pb-8 bg-slate-50">
-            <header className="bg-white p-4 sticky top-0 z-10 shadow-sm flex justify-between items-center">
-                <h1 className="text-xl font-bold text-theme">Expenses</h1>
-                {!isGuest && <button onClick={() => { setVegFromId(currentUser.id); setShowVegAddModal(true); }} className="bg-indigo-600 text-white p-2 rounded-full shadow-lg hover:bg-indigo-700"><Plus size={24} /></button>}
+        <div className="pb-32 bg-[#fafafa]">
+            <header className="flex justify-between items-center bg-white/95 backdrop-blur-2xl p-6 sticky top-0 z-50 rounded-b-[42px] border-b border-slate-50 shadow-[0_10px_40px_rgba(0,0,0,0.02)] pt-[max(env(safe-area-inset-top),1.5rem)]">
+                <div>
+                    <h1 className="text-[26px] font-black text-slate-900 tracking-[0.4em] uppercase drop-shadow-sm flex items-center leading-none">ROOM<span className="italic ml-1 text-3xl font-black text-indigo-600/90">-7</span></h1>
+                    <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.3em] mt-3 flex items-center gap-2">
+                        <Leaf size={12} strokeWidth={2.5} className="text-emerald-400/60" />
+                        Monthly Expenses
+                    </p>
+                </div>
+                <div className="flex items-center gap-3">
+                    <div className="relative cursor-pointer transition-transform hover:scale-105" onClick={() => document.querySelector('[aria-label="Profile"]')?.click()}>
+                        <MemberAvatar name={currentUser.name} code={currentUser.avatar} className="ring-2 ring-slate-100 shadow-sm" />
+                    </div>
+                </div>
             </header>
 
             <div className="p-4 space-y-6">
-                <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-violet-600 via-indigo-600 to-blue-600 p-8 text-white shadow-xl">
-                    <div className="absolute -right-12 -top-12 h-48 w-48 rounded-full bg-white/10 blur-3xl"></div>
+                <div className="relative overflow-hidden rounded-[38px] bg-white shadow-[0_8px_40px_rgba(0,0,0,0.03)] border border-slate-100/50 p-8 text-slate-900 group transition-all duration-1000">
+                    {/* ELITE MESH GRADIENT LAYER */}
+                    <div className="absolute inset-0 pointer-events-none overflow-hidden z-0 opacity-[0.6]">
+                        <div className="absolute top-[-20%] left-[-10%] w-[80%] h-[80%] rounded-full bg-indigo-100/40 blur-[100px] animate-mesh-1 mix-blend-multiply"></div>
+                        <div className="absolute bottom-[-20%] right-[-10%] w-[70%] h-[70%] rounded-full bg-violet-100/40 blur-[100px] animate-mesh-2 mix-blend-multiply"></div>
+                        <div className="absolute top-[20%] right-[10%] w-[60%] h-[60%] rounded-full bg-blue-50/50 blur-[100px] animate-mesh-3 mix-blend-multiply"></div>
+                    </div>
+
                     <div className="relative z-10 text-center">
-                        <div className="mb-4 inline-block rounded-full bg-white/20 px-4 py-1.5 backdrop-blur-md border border-white/10"><span className="text-[10px] font-bold uppercase tracking-widest text-indigo-50">Total Monthly Pool</span></div>
-                        <h2 className="text-5xl font-black tracking-tight mb-2 drop-shadow-sm">{formatCurrency(totalMonthlyExpenses)}</h2>
-                        <p className="text-xs text-indigo-200 mb-6">Includes Veg Fund Expenses</p>
+                        <div className="mb-6 inline-block rounded-full bg-white/40 backdrop-blur-2xl border border-white/80 px-5 py-2 shadow-[inset_0_1px_5px_rgba(255,255,255,0.8),0_2px_10px_rgba(0,0,0,0.02)]">
+                            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400">Monthly Budget</span>
+                        </div>
+                        <h2 className="text-[52px] font-black tracking-[-0.04em] mb-3 leading-none text-slate-900 drop-shadow-sm">{formatCurrency(totalMonthlyExpenses)}</h2>
+                        <p className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-400 mb-8 opacity-70 flex items-center justify-center gap-2">
+                            <span className="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
+                            Total Fund
+                        </p>
 
                         {!isGuest && (
                             <button
                                 onClick={() => setShowGenModal(true)}
-                                className="mx-auto px-5 py-2.5 bg-white text-indigo-600 rounded-xl font-bold text-sm shadow-lg flex items-center justify-center gap-2 hover:bg-indigo-50 transition-all active:scale-95"
+                                className="mx-auto px-8 py-4 bg-slate-900 text-white rounded-[22px] font-black text-[11px] tracking-[0.3em] uppercase shadow-[0_10px_25px_rgba(15,23,42,0.15)] flex items-center justify-center gap-3 hover:shadow-[0_15px_35px_rgba(15,23,42,0.25)] hover:translate-y-[-3px] transition-all duration-300 active:translate-y-[1px]"
                             >
-                                <Plus size={18} /> Add General Expense
+                                <Plus size={18} strokeWidth={3} /> Add Expense
                             </button>
                         )}
                     </div>
                 </div>
 
-                <div>
-                    <div className="flex items-center justify-between mb-2 px-1">
-                        <h3 className="font-bold text-slate-700 flex items-center gap-2"><Leaf size={18} className="text-emerald-500" /> Veg Fund</h3>
-                        {vegHandlerId ? <Badge variant="success">Handler: {members.find(m => m.id === vegHandlerId)?.name}</Badge> : <Badge variant="warning">No Handler</Badge>}
+                <div className="space-y-4">
+                    <div className="flex items-center justify-between px-2">
+                        <h3 className="text-base font-black text-slate-800 tracking-tight flex items-center gap-3 italic uppercase"><ShoppingCart size={20} className="text-emerald-500" strokeWidth={2.5} /> General</h3>
+                        {vegHandlerId ? <Badge variant="success" className="bg-emerald-500/5 text-emerald-600 border-none px-4 py-1.5 text-[10px] font-black tracking-widest uppercase">Verified</Badge> : <Badge variant="warning">No Handler</Badge>}
                     </div>
-                    <Card className="p-4 bg-emerald-50 border-emerald-100">
-                        <div className="grid grid-cols-3 gap-2 text-center mb-6">
-                            <div><p className="text-xs text-emerald-600 font-bold uppercase">Given</p><p className="font-bold text-theme">{formatCurrency(totalVegGiven)}</p></div>
-                            <div><p className="text-xs text-rose-600 font-bold uppercase">Spent</p><p className="font-bold text-theme">{formatCurrency(totalVegExpenses)}</p></div>
-                            <div><p className="text-xs text-blue-600 font-bold uppercase">Balance</p><p className={`font-black ${vegBalance < 0 ? 'text-rose-600' : 'text-emerald-600'}`}>{formatCurrency(vegBalance)}</p></div>
-                        </div>
+
+                    <Card className="p-7 shadow-[0_4px_30px_rgba(0,0,0,0.02)] border border-slate-100/50 overflow-hidden relative">
+                        {/* Subtle Background Glow */}
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-50/40 blur-[60px] rounded-full pointer-events-none -mr-10 -mt-10"></div>
+
+                        {(() => {
+                            const grocPercent = groceriesGiven > 0 ? Math.min(100, Math.round((groceriesExpenses / groceriesGiven) * 100)) : 0;
+                            return (
+                                <>
+                                    <div className="flex justify-between items-start mb-8 relative z-10">
+                                        <div>
+                                            <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.4em] mb-3">Balance</p>
+                                            <p className={`font-black tracking-[-0.03em] text-[36px] leading-none ${groceriesBalance < 0 ? 'text-rose-500' : 'text-slate-900'}`}>{formatCurrency(groceriesBalance)}</p>
+                                        </div>
+                                        <div className="text-right">
+                                            <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.4em] mb-3">Spent</p>
+                                            <p className="font-black text-slate-700 text-lg leading-none">{formatCurrency(groceriesExpenses)} <span className="text-slate-300 text-xs font-black uppercase tracking-widest ml-1">/ {formatCurrency(groceriesGiven)}</span></p>
+                                        </div>
+                                    </div>
+
+                                    <div className="mb-10 relative z-10">
+                                        <div className="flex justify-between text-[10px] font-black text-slate-400 mb-3 uppercase tracking-[0.3em]">
+                                            <span className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-emerald-400"></div> Budget Used</span>
+                                            <span className="text-slate-900">{grocPercent}%</span>
+                                        </div>
+                                        <div className="h-3 rounded-full bg-slate-50 overflow-hidden relative border border-slate-100 shadow-[inset_0_1px_3px_rgba(0,0,0,0.02)]">
+                                            <div className="absolute top-0 left-0 h-full rounded-full bg-gradient-to-r from-emerald-400 to-indigo-500 transition-all duration-1000 ease-out shadow-[0_0_10px_rgba(52,211,153,0.3)]" style={{ width: `${grocPercent}%` }} />
+                                        </div>
+                                    </div>
+                                </>
+                            );
+                        })()}
+
                         {renderCategoryList('Groceries', CATEGORY_GROCERIES)}
+                        {isHandler && !isGuest && (
+                            <div className="mt-8 pt-6 border-t border-slate-100">
+                                <button onClick={() => { setVegCategory(CATEGORY_GROCERIES); setShowVegExpModal(true); }} className="w-full py-4 bg-white border border-slate-100 text-rose-500 rounded-[22px] font-black text-[11px] uppercase tracking-[0.3em] flex items-center justify-center gap-3 hover:bg-rose-50 hover:border-rose-100 transition-all duration-300 shadow-sm active:scale-95"><Minus size={16} strokeWidth={3} /> Add Expense</button>
+                            </div>
+                        )}
+                    </Card>
+
+                    <div className="flex items-center justify-between px-2 mt-10">
+                        <h3 className="text-base font-black text-slate-800 tracking-tight flex items-center gap-3 italic uppercase"><Leaf size={20} className="text-emerald-500" strokeWidth={2.5} /> Organic</h3>
+                    </div>
+                    <Card className="p-7 shadow-[0_4px_30px_rgba(0,0,0,0.02)] border border-slate-100/50 overflow-hidden relative">
+                        {/* Subtle Background Glow */}
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-amber-50/40 blur-[60px] rounded-full pointer-events-none -mr-10 -mt-10"></div>
+
+                        {(() => {
+                            const vegPercent = vegOnlyGiven > 0 ? Math.min(100, Math.round((vegOnlyExpenses / vegOnlyGiven) * 100)) : 0;
+                            return (
+                                <>
+                                    <div className="flex justify-between items-start mb-8 relative z-10">
+                                        <div>
+                                            <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.4em] mb-3">Balance</p>
+                                            <p className={`font-black tracking-[-0.03em] text-[36px] leading-none ${vegOnlyBalance < 0 ? 'text-rose-500' : 'text-slate-900'}`}>{formatCurrency(vegOnlyBalance)}</p>
+                                        </div>
+                                        <div className="text-right">
+                                            <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.4em] mb-3">Spent</p>
+                                            <p className="font-black text-slate-700 text-lg leading-none">{formatCurrency(vegOnlyExpenses)} <span className="text-slate-300 text-xs font-black uppercase tracking-widest ml-1">/ {formatCurrency(vegOnlyGiven)}</span></p>
+                                        </div>
+                                    </div>
+
+                                    <div className="mb-10 relative z-10">
+                                        <div className="flex justify-between text-[10px] font-black text-slate-400 mb-3 uppercase tracking-[0.3em]">
+                                            <span className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-amber-400"></div> Used</span>
+                                            <span className="text-slate-900">{vegPercent}%</span>
+                                        </div>
+                                        <div className="h-3 rounded-full bg-slate-50 overflow-hidden relative border border-slate-100 shadow-[inset_0_1px_3px_rgba(0,0,0,0.02)]">
+                                            <div className="absolute top-0 left-0 h-full rounded-full bg-gradient-to-r from-amber-400 to-emerald-500 transition-all duration-1000 ease-out shadow-[0_0_10px_rgba(251,191,36,0.3)]" style={{ width: `${vegPercent}%` }} />
+                                        </div>
+                                    </div>
+                                </>
+                            );
+                        })()}
+
                         {renderCategoryList('Vegetables', CATEGORY_VEGETABLES)}
                         {isHandler && !isGuest && (
-                            <div className="mt-4 pt-4 border-t border-emerald-200/50">
-                                <button onClick={() => setShowVegExpModal(true)} className="w-full py-2.5 bg-white border border-rose-200 text-rose-600 rounded-xl font-bold text-sm flex items-center justify-center gap-2 hover:bg-rose-50"><Minus size={16} /> Add Expense</button>
+                            <div className="mt-8 pt-6 border-t border-slate-100">
+                                <button onClick={() => { setVegCategory(CATEGORY_VEGETABLES); setShowVegExpModal(true); }} className="w-full py-4 bg-white border border-slate-100 text-rose-500 rounded-[22px] font-black text-[11px] uppercase tracking-[0.3em] flex items-center justify-center gap-3 hover:bg-rose-50 hover:border-rose-100 transition-all duration-300 shadow-sm active:scale-95"><Minus size={16} strokeWidth={3} /> Add Expense</button>
                             </div>
                         )}
                     </Card>
                 </div>
 
-                <div className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
-                    <div className="p-4 border-b border-slate-100 font-bold text-slate-700">History</div>
-                    {expenses.length === 0 && vegExpenses.length === 0 && vegCollections.length === 0 ? <div className="p-8 text-center text-slate-400">No transactions.</div> : (
-                        <div className="divide-y divide-slate-100">
+                <div className="bg-white rounded-[32px] shadow-[0_4px_30px_rgba(0,0,0,0.02)] border border-slate-100/50 overflow-hidden">
+                    <div className="p-5 border-b border-slate-50 font-black text-slate-400 text-[10px] uppercase tracking-[0.4em]">Recent History (15)</div>
+                    {expenses.length === 0 && vegExpenses.length === 0 && vegCollections.length === 0 ? <div className="p-10 text-center text-slate-300 text-[11px] font-black uppercase tracking-widest italic">No transactions recorded.</div> : (
+                        <div className="divide-y divide-slate-50 max-h-[400px] overflow-y-auto pr-1 no-scrollbar">
                             {[
                                 ...expenses.map(e => ({ ...e, type: 'general', collection: 'expenses', date: new Date(e.date) })),
                                 ...vegExpenses.map(e => ({ ...e, type: 'vegExp', collection: 'vegExpenses', date: new Date(e.date) })),
                                 ...vegCollections.map(e => ({ ...e, type: 'vegCol', collection: 'vegCollections', date: new Date(e.date) }))
-                            ].sort((a, b) => b.date - a.date).map(t => {
+                            ].sort((a, b) => b.date - a.date).slice(0, 15).map(t => {
 
                                 const canDelete = !isGuest; // HOTFIX: Allow all to delete
 
                                 return (
-                                    <div key={t.id} className="p-4 flex justify-between items-center group hover:bg-slate-50 transition-colors">
-                                        <div className="flex items-center gap-4">
-                                            <div className={`p-2.5 rounded-full ${t.type === 'general' ? 'bg-indigo-50 text-indigo-600' : t.type === 'vegExp' ? 'bg-rose-50 text-rose-600' : 'bg-emerald-50 text-emerald-600'}`}>
-                                                {t.type === 'general' ? <ShoppingCart size={18} /> : t.type === 'vegExp' ? <Minus size={18} /> : <Plus size={18} />}
+                                    <div key={t.id} className="p-5 flex justify-between items-center group/tx hover:bg-slate-50/50 transition-all duration-300">
+                                        <div className="flex items-center gap-5">
+                                            <div className={`w-12 h-12 rounded-[18px] flex items-center justify-center transition-all duration-500 shadow-sm ${t.type === 'general' ? 'bg-indigo-50 text-indigo-500' : t.type === 'vegExp' ? 'bg-rose-50 text-rose-500' : 'bg-emerald-50 text-emerald-500'}`}>
+                                                {t.type === 'general' ? <ShoppingCart size={20} strokeWidth={2.5} /> : t.type === 'vegExp' ? <Minus size={20} strokeWidth={3} /> : <Plus size={20} strokeWidth={3} />}
                                             </div>
                                             <div>
-                                                <p className="font-bold text-theme text-sm">
+                                                <p className="font-black text-slate-800 text-[14px] tracking-tight mb-1">
                                                     {t.type === 'general' ? (t.notes || 'General Expense') :
                                                         t.type === 'vegExp' ? (t.desc || 'Veg Expense') :
-                                                            'Veg Contribution'}
+                                                            'Fund Contribution'}
                                                 </p>
-                                                <div className="flex items-center gap-2 text-xs text-slate-400 font-medium">
-                                                    <span>
-                                                        {t.type === 'general' ? members.find(m => m.id === t.paidBy)?.name :
-                                                            t.type === 'vegExp' ? 'Veg Fund' :
-                                                                members.find(m => m.id === t.fromMemberId)?.name}
+                                                <div className="flex items-center gap-2.5 text-[10px] text-slate-400 font-black uppercase tracking-[0.2em]">
+                                                    <span className="text-indigo-400/80">
+                                                        {t.type === 'general' ? (members.find(m => m.id === t.paidBy)?.name || 'Member') :
+                                                            t.type === 'vegExp' ? 'Monthly Fund' :
+                                                                (members.find(m => m.id === t.fromMemberId)?.name || 'Member')}
                                                     </span>
-                                                    <span className="w-1 h-1 rounded-full bg-slate-300"></span>
+                                                    <span className="w-1 h-1 rounded-full bg-slate-200"></span>
                                                     <span>{t.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="flex items-center gap-4">
-                                            <span className={`font-black text-sm ${t.type === 'vegCol' ? 'text-emerald-600' : 'text-slate-900'}`}>
+                                        <div className="flex items-center gap-5">
+                                            <span className={`font-black text-sm tracking-tight ${t.type === 'vegCol' ? 'text-emerald-600' : 'text-slate-900'}`}>
                                                 {t.type === 'vegCol' ? '+' : '-'}{formatCurrency(t.amount)}
                                             </span>
                                             {canDelete && (
                                                 <button
                                                     onClick={() => {
-                                                        if (window.confirm("Delete this transaction?")) {
+                                                        if (window.confirm("Purge this record?")) {
                                                             haptic.medium();
                                                             deleteTransaction(t.collection, t.id);
                                                         }
                                                     }}
-                                                    className="p-2 text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-full transition-all opacity-0 group-hover:opacity-100"
-                                                    title="Delete"
+                                                    className="p-2 text-slate-200 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition-all md:opacity-0 group-hover/tx:opacity-100"
+                                                    title="Purge"
                                                 >
                                                     <Trash2 size={16} />
                                                 </button>
@@ -313,92 +407,124 @@ const ExpensesView = ({
                     )}
                 </div>
 
-                {canReset && !isGuest ? (
-                    <button onClick={() => { haptic.medium(); resetMonth(); }} className="w-full py-3 text-rose-600 font-medium text-sm flex justify-center items-center gap-2 hover:bg-rose-50 rounded-xl transition-colors"><Trash2 size={16} /> End Month & Reset All</button>
-                ) : <div className="text-center text-xs text-slate-400 p-2 italic">{isGuest ? 'Log in to manage expenses.' : 'Only Cook or Veg Handler can reset.'}</div>}
+                <div className="pt-4">
+                    {canReset && !isGuest ? (
+                        <button onClick={() => { haptic.medium(); resetMonth(); }} className="w-full py-5 text-slate-400 hover:text-rose-500 font-black text-[11px] uppercase tracking-[0.4em] flex justify-center items-center gap-3 hover:bg-rose-50/50 rounded-[28px] border border-transparent hover:border-rose-100 transition-all duration-500"><Trash2 size={16} /> Start New Month</button>
+                    ) : <div className="text-center text-[10px] font-black text-slate-300 p-2 uppercase tracking-[0.3em]">{isGuest ? 'Authentication required for management.' : 'Authorized personnel only.'}</div>}
+                </div>
             </div>
 
             {showGenModal && (
-                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-                    <div className="bg-white w-full max-w-md rounded-2xl p-6">
-                        <div className="flex justify-between items-center mb-4"><h2 className="font-bold">Add General Expense</h2><button onClick={() => setShowGenModal(false)}><X size={20} /></button></div>
-                        <form onSubmit={handleGenSubmit} className="space-y-4">
-                            <input type="number" required value={genAmount} onChange={e => setGenAmount(e.target.value)} className="w-full p-3 border rounded-xl" placeholder="Amount (₹)" />
-                            <input type="text" value={genNote} onChange={e => setGenNote(e.target.value)} className="w-full p-3 border rounded-xl" placeholder="Description" />
-                            <button type="submit" className="w-full bg-slate-900 text-white py-3 rounded-xl font-bold">Save</button>
+                <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-6 sm:p-4 animate-in fade-in duration-300">
+                    <div className="bg-white w-full max-w-md rounded-[38px] p-8 shadow-[0_20px_60px_rgba(0,0,0,0.1)] border border-slate-100">
+                        <div className="flex justify-between items-center mb-8">
+                            <h2 className="text-xl font-black text-slate-800 tracking-tight flex items-center gap-3"><div className="p-2 bg-indigo-50 text-indigo-500 rounded-xl"><Plus size={20} strokeWidth={3} /></div> Add Expense</h2>
+                            <button onClick={() => setShowGenModal(false)} className="p-2 hover:bg-slate-50 rounded-full transition-colors text-slate-300"><X size={20} /></button>
+                        </div>
+                        <form onSubmit={handleGenSubmit} className="space-y-6">
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 ml-1">Amount (₹)</label>
+                                <input type="number" required value={genAmount} onChange={e => setGenAmount(e.target.value)} className="w-full p-5 bg-slate-50 border border-slate-100 rounded-[22px] font-black text-2xl tracking-tight focus:ring-4 focus:ring-indigo-500/5 transition-all outline-none" placeholder="0.00" />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 ml-1">Notes</label>
+                                <input type="text" value={genNote} onChange={e => setGenNote(e.target.value)} className="w-full p-5 bg-slate-50 border border-slate-100 rounded-[22px] font-bold text-slate-700 focus:ring-4 focus:ring-indigo-500/5 transition-all outline-none" placeholder="Description of expense" />
+                            </div>
+                            <button type="submit" className="w-full bg-slate-900 text-white py-5 rounded-[22px] font-black text-[11px] uppercase tracking-[0.3em] shadow-[0_10px_25px_rgba(15,23,42,0.15)] hover:shadow-[0_15px_35px_rgba(15,23,42,0.25)] transition-all active:scale-95">Save Expense</button>
                         </form>
                     </div>
                 </div>
             )}
 
             {showVegAddModal && (
-                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-                    <div className="bg-white w-full max-w-md rounded-2xl p-6">
-                        <div className="flex justify-between items-center mb-4"><h2 className="font-bold text-emerald-800">Add Money</h2><button onClick={() => setShowVegAddModal(false)}><X size={20} /></button></div>
-                        <form onSubmit={handleVegAddSubmit} className="space-y-4">
-                            <div className="flex bg-slate-100 p-1 rounded-xl">
-                                <button type="button" onClick={() => setVegCategory(CATEGORY_GROCERIES)} className={`flex-1 py-2 rounded-lg text-sm font-bold transition-all ${vegCategory === CATEGORY_GROCERIES ? 'bg-white shadow text-emerald-700' : 'text-slate-500'}`}>Groceries</button>
-                                <button type="button" onClick={() => setVegCategory(CATEGORY_VEGETABLES)} className={`flex-1 py-2 rounded-lg text-sm font-bold transition-all ${vegCategory === CATEGORY_VEGETABLES ? 'bg-white shadow text-emerald-700' : 'text-slate-500'}`}>Vegetables</button>
+                <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-6 sm:p-4 animate-in fade-in duration-300">
+                    <div className="bg-white w-full max-w-md rounded-[38px] p-8 shadow-[0_20px_60px_rgba(0,0,0,0.1)] border border-slate-100">
+                        <div className="flex justify-between items-center mb-8">
+                            <h2 className="text-xl font-black text-emerald-800 tracking-tight flex items-center gap-3"><div className="p-2 bg-emerald-50 text-emerald-500 rounded-xl"><Plus size={20} strokeWidth={3} /></div> Add Funds</h2>
+                            <button onClick={() => setShowVegAddModal(false)} className="p-2 hover:bg-slate-50 rounded-full transition-colors text-slate-300"><X size={20} /></button>
+                        </div>
+                        <form onSubmit={handleVegAddSubmit} className="space-y-6">
+                            <div className="flex bg-slate-100/50 p-1.5 rounded-[22px] border border-slate-100">
+                                <button type="button" onClick={() => setVegCategory(CATEGORY_GROCERIES)} className={`flex-1 py-3 rounded-[16px] text-[10px] font-black uppercase tracking-[0.2em] transition-all ${vegCategory === CATEGORY_GROCERIES ? 'bg-white shadow-sm text-emerald-700' : 'text-slate-400'}`}>Groceries</button>
+                                <button type="button" onClick={() => setVegCategory(CATEGORY_VEGETABLES)} className={`flex-1 py-3 rounded-[16px] text-[10px] font-black uppercase tracking-[0.2em] transition-all ${vegCategory === CATEGORY_VEGETABLES ? 'bg-white shadow-sm text-emerald-700' : 'text-slate-400'}`}>Organic</button>
                             </div>
-                            <div>
-                                <label className="block text-xs font-bold text-slate-500 mb-1">From</label>
+
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 ml-1">Authorized Person</label>
                                 {isHandler ? (
-                                    <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
+                                    <div className="flex gap-3 overflow-x-auto pb-3 no-scrollbar">
                                         {members.map(m => (
-                                            <button type="button" key={m.id} onClick={() => setVegFromId(m.id)} className={`flex-shrink-0 px-3 py-2 rounded-lg border text-xs font-bold transition-all flex items-center gap-1 ${vegFromId === m.id ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white border-slate-200'}`}>
-                                                {vegFromId === m.id && <CheckCircle2 size={12} />}
+                                            <button type="button" key={m.id} onClick={() => setVegFromId(m.id)} className={`flex-shrink-0 px-5 py-3 rounded-[18px] border text-[11px] font-black tracking-tight transition-all flex items-center gap-2 group/btn ${vegFromId === m.id ? 'bg-emerald-600 text-white border-emerald-600 shadow-[0_4px_15px_rgba(16,185,129,0.3)]' : 'bg-white border-slate-100 text-slate-500 hover:border-emerald-200'}`}>
+                                                <MemberAvatar name={m.name} code={m.avatar} size="xs" className={`transition-transform duration-500 ${vegFromId === m.id ? 'ring-2 ring-emerald-400/50' : ''}`} />
                                                 {m.name}
                                             </button>
                                         ))}
                                     </div>
                                 ) : (
-                                    <div className="p-3 bg-slate-50 border rounded-xl text-sm font-bold text-slate-600 flex items-center gap-2">
-                                        <MemberAvatar name={currentUser.name} code={currentUser.avatar} size="sm" />
-                                        {currentUser.name} (You)
+                                    <div className="p-4 bg-slate-50/50 border border-slate-100 rounded-[22px] text-sm font-black text-slate-600 flex items-center justify-between">
+                                        <div className="flex items-center gap-3">
+                                            <MemberAvatar name={currentUser.name} code={currentUser.avatar} size="sm" />
+                                            <span>{currentUser.name} <span className="text-slate-300 font-medium ml-1">(Me)</span></span>
+                                        </div>
+                                        <Badge className="bg-indigo-50 text-indigo-500 border-none px-3 font-black text-[9px]">ACTIVE</Badge>
                                     </div>
                                 )}
                             </div>
-                            <div className="relative">
-                                <label className="block text-xs font-bold text-slate-500 mb-1">Amount to Add</label>
-                                <input type="number" required value={vegAmount} onChange={e => setVegAmount(e.target.value)} className="w-full p-3 border rounded-xl font-mono font-bold text-lg" placeholder="Amount (₹)" />
+
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 ml-1">Amount (₹)</label>
+                                <input type="number" required value={vegAmount} onChange={e => setVegAmount(e.target.value)} className="w-full p-5 bg-slate-50 border border-slate-100 rounded-[22px] font-black text-2xl tracking-tight focus:ring-4 focus:ring-emerald-500/5 transition-all outline-none" placeholder="0.00" />
                             </div>
+
                             {isHandler && (
-                                <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
-                                    <span className="text-xs text-slate-500 font-medium">Is this member cancelled for this month?</span>
-                                    <button type="button" onClick={handleCancelToggle} className={`text-xs font-bold px-3 py-1.5 rounded-lg border transition-colors ${vegExemptions.includes(`${vegFromId}-${vegCategory}`) ? 'bg-orange-500 border-orange-500 text-white' : 'bg-white border-slate-200 text-slate-400'}`}>
-                                        {vegExemptions.includes(`${vegFromId}-${vegCategory}`) ? 'Cancelled' : 'Active'}
+                                <div className="flex items-center justify-between p-5 bg-orange-50/30 rounded-[22px] border border-orange-100/30">
+                                    <span className="text-[10px] text-orange-400 font-black uppercase tracking-[0.2em]">Skip payment?</span>
+                                    <button type="button" onClick={handleCancelToggle} className={`text-[10px] font-black uppercase tracking-[0.3em] px-4 py-2.5 rounded-[14px] border transition-all ${vegExemptions.includes(`${vegFromId}-${vegCategory}`) ? 'bg-orange-500 border-orange-500 text-white shadow-lg' : 'bg-white border-orange-100 text-orange-300'}`}>
+                                        {vegExemptions.includes(`${vegFromId}-${vegCategory}`) ? 'Exempt' : 'Hold'}
                                     </button>
                                 </div>
                             )}
-                            <button type="submit" className="w-full bg-emerald-600 text-white py-3 rounded-xl font-bold hover:bg-emerald-700 transition-colors">Record Payment</button>
+                            <button type="submit" className="w-full bg-emerald-600 text-white py-5 rounded-[22px] font-black text-[11px] uppercase tracking-[0.3em] shadow-[0_10px_25px_rgba(16,185,129,0.2)] hover:shadow-[0_15px_35px_rgba(16,185,129,0.3)] transition-all active:scale-95">Authorize Payment</button>
                         </form>
                     </div>
                 </div>
             )}
 
             {showVegExpModal && (
-                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-                    <div className="bg-white w-full max-w-md rounded-2xl p-6">
-                        <div className="flex justify-between items-center mb-4"><h2 className="font-bold text-rose-700">Add Veg Expense</h2><button onClick={() => setShowVegExpModal(false)}><X size={20} /></button></div>
-                        <form onSubmit={handleVegExpSubmit} className="space-y-4">
-                            <input type="number" required value={vegAmount} onChange={e => setVegAmount(e.target.value)} className="w-full p-3 border rounded-xl" placeholder="Cost (₹)" />
-                            <input type="text" value={vegNote} onChange={e => setVegNote(e.target.value)} className="w-full p-3 border rounded-xl" placeholder="Items" />
-                            <button type="submit" className="w-full bg-rose-600 text-white py-3 rounded-xl font-bold">Spend</button>
+                <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-6 animate-in fade-in duration-300">
+                    <div className="bg-white w-full max-w-md rounded-[38px] p-8 shadow-[0_20px_60px_rgba(0,0,0,0.1)] border border-slate-100">
+                        <div className="flex justify-between items-center mb-8">
+                            <h2 className="text-xl font-black text-rose-800 tracking-tight flex items-center gap-3"><div className="p-2 bg-rose-50 text-rose-500 rounded-xl"><Minus size={20} strokeWidth={3} /></div> Record Expense</h2>
+                            <button onClick={() => setShowVegExpModal(false)} className="p-2 hover:bg-slate-50 rounded-full transition-colors text-slate-300"><X size={20} /></button>
+                        </div>
+                        <form onSubmit={handleVegExpSubmit} className="space-y-6">
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 ml-1">Amount (₹)</label>
+                                <input type="number" required value={vegAmount} onChange={e => setVegAmount(e.target.value)} className="w-full p-5 bg-slate-50 border border-slate-100 rounded-[22px] font-black text-2xl tracking-tight focus:ring-4 focus:ring-rose-500/5 transition-all outline-none" placeholder="0.00" />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 ml-1">Items Purchased</label>
+                                <input type="text" value={vegNote} onChange={e => setVegNote(e.target.value)} className="w-full p-5 bg-slate-50 border border-slate-100 rounded-[22px] font-bold text-slate-700 focus:ring-4 focus:ring-rose-500/5 transition-all outline-none" placeholder="What was purchased?" />
+                            </div>
+                            <button type="submit" className="w-full bg-rose-600 text-white py-5 rounded-[22px] font-black text-[11px] uppercase tracking-[0.3em] shadow-[0_10px_25px_rgba(225,29,72,0.2)] hover:shadow-[0_15px_35px_rgba(225,29,72,0.3)] transition-all active:scale-95">Save Expense</button>
                         </form>
                     </div>
                 </div>
             )}
 
             {showEditAmountModal && (
-                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-                    <div className="bg-white w-full max-w-sm rounded-2xl p-6">
-                        <div className="flex justify-between items-center mb-4"><h2 className="font-bold text-theme capitalize">Edit {editingCategory} Amount</h2><button onClick={() => setShowEditAmountModal(false)}><X size={20} /></button></div>
-                        <form onSubmit={handleEditAmountSubmit} className="space-y-4">
-                            <div>
-                                <label className="block text-xs font-bold text-slate-500 mb-1">Default Expected Amount</label>
-                                <input type="number" required value={newExpectedAmount} onChange={e => setNewExpectedAmount(e.target.value)} className="w-full p-3 border rounded-xl font-mono font-bold text-lg" placeholder="Amount (₹)" />
+                <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-6 animate-in fade-in duration-300">
+                    <div className="bg-white w-full max-w-md rounded-[38px] p-8 shadow-[0_20px_60px_rgba(0,0,0,0.1)] border border-slate-100">
+                        <div className="flex justify-between items-center mb-8">
+                            <h2 className="text-xl font-black text-slate-800 tracking-tight flex items-center gap-3 italic"><div className="p-2 bg-indigo-50 text-indigo-500 rounded-xl"><Edit2 size={20} strokeWidth={3} /></div> Set Monthly Goal</h2>
+                            <button onClick={() => setShowEditAmountModal(false)} className="p-2 hover:bg-slate-50 rounded-full transition-colors text-slate-300"><X size={20} /></button>
+                        </div>
+                        <form onSubmit={handleEditAmountSubmit} className="space-y-6">
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 ml-1">Goal for {editingCategory} (₹)</label>
+                                <input type="number" required value={newExpectedAmount} onChange={e => setNewExpectedAmount(e.target.value)} className="w-full p-5 bg-slate-50 border border-slate-100 rounded-[22px] font-black text-2xl tracking-tight focus:ring-4 focus:ring-indigo-500/5 transition-all outline-none" placeholder="0.00" />
                             </div>
-                            <button type="submit" className="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold">Update Default</button>
+                            <button type="submit" className="w-full bg-slate-900 text-white py-5 rounded-[22px] font-black text-[11px] uppercase tracking-[0.3em] shadow-[0_10px_25px_rgba(15,23,42,0.15)] hover:shadow-[0_15px_35px_rgba(15,23,42,0.25)] transition-all active:scale-95">Save Goal</button>
                         </form>
                     </div>
                 </div>

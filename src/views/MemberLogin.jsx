@@ -115,10 +115,8 @@ const MemberLogin = ({ members, onLogin }) => {
         <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6 pb-20">
             <div className="w-full max-w-md space-y-8">
                 <div className="text-center space-y-2">
-                    <div className="inline-flex p-3 bg-white rounded-2xl shadow-sm mb-4">
-                        <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold">F</div>
-                    </div>
-                    <h1 className="text-2xl font-black text-theme tracking-tight">FlowHouse</h1>
+
+                    <h1 className="text-[26px] font-black text-slate-900 tracking-[0.3em] uppercase flex items-center justify-center">ROOM<span className="italic ml-1 text-3xl -mt-1">7</span></h1>
                     <p className="text-slate-500 font-medium">Who is using the app?</p>
                 </div>
 
